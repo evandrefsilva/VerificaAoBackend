@@ -216,7 +216,7 @@ namespace Data.Migrations
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "Id", "CreatedAt", "Email", "FirstName", "IsActive", "IsDeleted", "IsEmailVerified", "LastName", "Password", "ProfilePicture", "RoleId", "UpdatedAt", "Username", "VerifyCode", "VerifyCodeDate" },
-                values: new object[] { new Guid("11111111-1111-1111-1111-111111111111"), new DateTime(2024, 10, 5, 18, 0, 10, 705, DateTimeKind.Utc).AddTicks(8917), "admin@admin.com", "Administrador de Sistema", true, false, false, "Administrador de Sistema", "0f3d85258d593088098f65c26e89d49bf1bcf29b2b57dcfc36865ecefec7551fb8f232a028d98bd39acfb2710ef5e6e8f08e5a4ddbc213a82ad6008e64861abd", null, 1, null, "admin", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) });
+                values: new object[] { new Guid("11111111-1111-1111-1111-111111111111"), new DateTime(2024, 10, 6, 11, 41, 12, 863, DateTimeKind.Utc).AddTicks(1737), "admin@admin.com", "Administrador de Sistema", true, false, false, "Administrador de Sistema", "0f3d85258d593088098f65c26e89d49bf1bcf29b2b57dcfc36865ecefec7551fb8f232a028d98bd39acfb2710ef5e6e8f08e5a4ddbc213a82ad6008e64861abd", null, 1, null, "admin", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) });
 
             migrationBuilder.CreateIndex(
                 name: "IX_News_PublishedById",

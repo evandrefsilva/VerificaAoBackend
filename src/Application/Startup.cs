@@ -87,7 +87,7 @@ namespace Application
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<IComunicationService, ComunicationService>();
             services.AddTransient<IAppSettingsService, AppSettingsService>();
-            //services.AddTransient<ICandidateService, CandidateService>();
+            services.AddTransient<ITagService, TagService>();
             services.AddScoped<FileUploadService, FileUploadService>();
 
             var apiKey = Configuration.GetValue<string>("WesenderApiKey");

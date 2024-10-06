@@ -18,13 +18,13 @@ namespace Application.Controllers
         {
             _userService = userService;
         }
-      
+
         public IActionResult Login()
         {
             if (User.Identity.IsAuthenticated)
                 RedirectToAction("index", "admin");
-            
-                return PartialView();
+
+            return PartialView();
         }
         [HttpPost]
         public IActionResult Login(LoginDTO dto)
@@ -34,24 +34,24 @@ namespace Application.Controllers
             {
                 var user = (ReturnLoginDTO)resultLogin.Object;
                 var name = user.Name;
-             
+
                 var userId = user.UserId.ToString().ToLower();
                 var email = user.Email;
 
                 var claims = new List<Claim>
                 {
-                    new Claim(ClaimTypes.NameIdentifier,dto.Username),
+                    new Claim(ClaimTypes.NameIdentifier,dto.Email),
                     new Claim("name", name),
                     new Claim("email", email),
                     new Claim(ClaimTypes.Role, "admin"),
 
                     new Claim(ClaimTypes.PrimarySid,userId),
               };
-               
+
                 var claimsIdentity = new ClaimsIdentity(claims, "Login");
 
                 HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
-                    new ClaimsPrincipal(claimsIdentity),new AuthenticationProperties { IsPersistent= true});
+                    new ClaimsPrincipal(claimsIdentity), new AuthenticationProperties { IsPersistent = true });
 
                 return RedirectToAction("index", "admin");
             }

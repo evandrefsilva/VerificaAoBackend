@@ -123,7 +123,7 @@ namespace Data.Migrations
                         new
                         {
                             Id = new Guid("11111111-1111-1111-1111-111111111111"),
-                            CreatedAt = new DateTime(2024, 10, 5, 18, 0, 10, 705, DateTimeKind.Utc).AddTicks(8917),
+                            CreatedAt = new DateTime(2024, 10, 6, 11, 41, 12, 863, DateTimeKind.Utc).AddTicks(1737),
                             Email = "admin@admin.com",
                             FirstName = "Administrador de Sistema",
                             IsActive = true,

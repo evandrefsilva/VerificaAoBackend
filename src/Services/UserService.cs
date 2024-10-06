@@ -32,10 +32,10 @@ namespace Services
         private readonly DataContext _db;
         private readonly string _jwtSecret;
 
-        public UserService(DataContext db, string jwtSecret)
+        public UserService(DataContext db)
         {
             _db = db;
-            _jwtSecret = jwtSecret;
+            _jwtSecret = "secret";
         }
 
         public AppResult Login(LoginDTO dto)
