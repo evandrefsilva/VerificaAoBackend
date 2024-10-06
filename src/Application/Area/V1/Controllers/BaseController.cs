@@ -17,11 +17,11 @@ namespace Application.Areas.V1.Controllers
     {
 
         [NonAction]
-        public string UploadDocument(IFormFile file, string folder, Guid id)
+        public string UploadFile(IFormFile file, string folder, Guid id)
         {
-            var fileName = id.ToString();
-            var filePathVirtual = "/Storage" + "/" + folder + "/" + fileName;
-            var filePath = Path.Combine(Environment.CurrentDirectory, "wwwroot", "Storage", folder);
+            var fileName = id.ToString() + Path.GetExtension(file.FileName);
+            var filePathVirtual = "/storage" + "/" + folder + "/" + fileName;
+            var filePath = Path.Combine(Environment.CurrentDirectory, "wwwroot", "storage", folder);
 
             if (!Directory.Exists(filePath))
                 Directory.CreateDirectory(filePath);
@@ -40,8 +40,8 @@ namespace Application.Areas.V1.Controllers
             try
             {
                 var fileName = id.ToString() + Path.GetExtension(file.FileName);
-                var filePathVirtual = "/Storage" + "/" + folder + "/" + fileName;
-                var filePath = Path.Combine(Environment.CurrentDirectory, "wwwroot", "Storage", folder);
+                var filePathVirtual = "/storage" + "/" + folder + "/" + fileName;
+                var filePath = Path.Combine(Environment.CurrentDirectory, "wwwroot", "storage", folder);
                 if (System.IO.File.Exists(filePath))
                     System.IO.File.Delete(filePath);
                 if (!Directory.Exists(filePath))
@@ -58,7 +58,7 @@ namespace Application.Areas.V1.Controllers
             {
                 return null;
             }
-            }
+        }
         [NonAction]
         public string DeleteFile(string UrlFile)
         {

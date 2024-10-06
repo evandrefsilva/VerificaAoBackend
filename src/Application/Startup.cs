@@ -44,13 +44,13 @@ namespace Application
             {
                 c.SwaggerDoc("v1", new OpenApiInfo
                 {
-                    Title = "Unitel Estrelas Ao Palco API v1",
+                    Title = "Verifica Ao API v1",
                     Version = "v1",
-                    Description = "Unitel Estrelas Ao Palco API",
+                    Description = "Verifica Ao API v1",
                     Contact = new OpenApiContact
                     {
-                        Name = "Unitel Estrelas Ao Palco",
-                        Email = "developers@digitalfactory.co.ao",
+                        Name = "Verifica Ao API v1",
+                        Email = "developer@tis.ao",
                         //Url = new Uri("https://digitalfactory.co.ao"),
                     },
                 });
@@ -64,7 +64,7 @@ namespace Application
            .AddCookie(config =>
            {
                //config.Cookie.IsEssential = true;
-               config.Cookie.Name = $"inscricoesStarOnStage.Cookie";
+               config.Cookie.Name = $"verifica.Cookie";
                config.LoginPath = "/account/login";
                config.AccessDeniedPath = "/_401";
 
@@ -88,6 +88,7 @@ namespace Application
             services.AddTransient<IComunicationService, ComunicationService>();
             services.AddTransient<IAppSettingsService, AppSettingsService>();
             services.AddTransient<ITagService, TagService>();
+            services.AddTransient<INewsService, NewsService>();
             services.AddScoped<FileUploadService, FileUploadService>();
 
             var apiKey = Configuration.GetValue<string>("WesenderApiKey");

@@ -1,4 +1,5 @@
 ﻿
+using Application.Areas.V1.Controllers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services;
@@ -10,7 +11,7 @@ namespace Application.Area.V1.Controllers
     [Route("api/[controller]")]
     [ApiController]
     //[Authorize(Roles = "Admin, Manager")]
-    public class TagController : ControllerBase
+    public class TagController : BaseController
     {
         private readonly ITagService _tagService;
 

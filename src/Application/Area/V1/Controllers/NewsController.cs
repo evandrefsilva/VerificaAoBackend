@@ -4,11 +4,11 @@ using Microsoft.AspNetCore.Mvc;
 using Services.Models.DTO;
 using System.Threading.Tasks;
 using System.Threading;
+using System;
 
 namespace Application.Areas.V1.Controllers
 {
     [ApiController]
-    [Route("api/v1/[controller]")]
     public class NewsController : BaseController
     {
         private readonly INewsService _newsService;
@@ -19,39 +19,56 @@ namespace Application.Areas.V1.Controllers
         }
 
         // 1. Criar uma nova notícia
-        [HttpPost("create")]
-        [Authorize]
-        public async Task<IActionResult> CreateNews([FromBody] NewsDTOInput newsDTO, CancellationToken cancellationToken)
+        [HttpPost]
+        //[Authorize]
+        public async Task<IActionResult> CreateNews([FromForm] NewsDTOInput newsDTO, CancellationToken cancellationToken)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var result = await _newsService.Create(newsDTO, cancellationToken);
+            if (newsDTO.CoverFile != null)
+                newsDTO.CoverUrl = UploadFile(newsDTO.CoverFile, "news", Guid.NewGuid());
+
+            var result = await _newsService.Create(newsDTO, Guid.Parse(Guid.Empty.ToString().Replace("0", "1")), cancellationToken);
             if (result.Success)
                 return Ok(result);
             return BadRequest(result);
         }
 
         // 2. Editar uma notícia existente
-        [HttpPut("{id}/edit")]
-        [Authorize]
-        public async Task<IActionResult> EditNews(int id, [FromBody] NewsDTOInput newsDTO, CancellationToken cancellationToken)
+        [HttpPut("{id}")]
+        // [Authorize]
+        public async Task<IActionResult> EditNews(int id, [FromForm] NewsDTOInput newsDTO, CancellationToken cancellationToken)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
+
+            if (newsDTO.CoverFile != null)
+                newsDTO.CoverUrl = UploadFile(newsDTO.CoverFile, "news", Guid.NewGuid());
 
             var result = await _newsService.Edit(id, newsDTO, cancellationToken);
             if (result.Success)
                 return Ok(result);
             return BadRequest(result);
         }
-
-        // 3. Listar todas as notícias
-        [HttpGet("all")]
-        [AllowAnonymous]
-        public IActionResult GetAllNews(int page = 1, int take = 30, string filter = null)
+        [HttpDelete("{id}")]
+        // [Authorize]
+        public async Task<IActionResult> DeleteNews(int id, CancellationToken cancellationToken)
         {
-            var result = _newsService.GetAll(page, take, filter);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var result = await _newsService.Delete(id, cancellationToken);
+            if (result.Success)
+                return Ok(result);
+            return BadRequest(result);
+        }
+        // 3. Listar todas as notícias
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetAllNews(int page = 1, int take = 30, string filter = null)
+        {
+            var result = await _newsService.GetAll(page, take, filter);
             if (result.Success)
                 return Ok(result);
             return BadRequest(result);
@@ -59,7 +76,7 @@ namespace Application.Areas.V1.Controllers
 
         // 4. Verificar uma notícia
         [HttpPost("{newsId}/verify")]
-        [Authorize]
+        //[Authorize]
         public async Task<IActionResult> VerifyNews(int newsId, [FromBody] VerificationDTOInput verificationDTO, CancellationToken cancellationToken)
         {
             if (!ModelState.IsValid)
@@ -74,9 +91,9 @@ namespace Application.Areas.V1.Controllers
         // 5. Listar notícias publicadas
         [HttpGet("published")]
         [AllowAnonymous]
-        public IActionResult GetAllPublished(int page = 1, int take = 30, string filter = null)
+        public async Task<IActionResult> GetAllPublished(int page = 1, int take = 30, string filter = null)
         {
-            var result = _newsService.GetAllPublished(page, take, filter);
+            var result = await _newsService.GetAllPublished(page, take, filter);
             if (result.Success)
                 return Ok(result);
             return BadRequest(result);
@@ -85,9 +102,9 @@ namespace Application.Areas.V1.Controllers
         // 6. Listar notícias populares
         [HttpGet("popular")]
         [AllowAnonymous]
-        public IActionResult GetPopularNews(int page = 1, int take = 30)
+        public async Task<IActionResult> GetPopularNews(int page = 1, int take = 30)
         {
-            var result = _newsService.GetPopularNews(page, take);
+            var result = await _newsService.GetPopularNews(page, take);
             if (result.Success)
                 return Ok(result);
             return BadRequest(result);
@@ -96,12 +113,43 @@ namespace Application.Areas.V1.Controllers
         // 7. Listar notícias por tag
         [HttpGet("tag/{tag}")]
         [AllowAnonymous]
-        public IActionResult GetNewsByTag(string tag, int page = 1, int take = 30)
+        public async Task<IActionResult> GetNewsByTag(string tag, int page = 1, int take = 30)
         {
-            var result = _newsService.GetNewsByTag(tag, page, take);
+            var result = await _newsService.GetNewsByTag(tag, page, take);
             if (result.Success)
                 return Ok(result);
             return BadRequest(result);
+        }
+
+        // 7. Listar notícias por tag
+        [HttpGet("tag/{id}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetNewsById(int id, int page = 1, int take = 30, CancellationToken cancellationToken = default)
+        {
+            var result = await _newsService.GetNewsDetails(id, cancellationToken);
+            if (result.Success)
+                return Ok(result);
+            return BadRequest(result);
+        }
+        [HttpPost("like")]
+        public async Task<IActionResult> Like([FromBody] LikeDTO dto, CancellationToken cancellationToken)
+        {
+            var result = await _newsService.Like(dto, cancellationToken);
+            if (!result.Success)
+                return BadRequest(result);
+
+            return Ok(result);
+        }
+
+        // Endpoint for Unlike
+        [HttpPost("unlike")]
+        public async Task<IActionResult> Unlike([FromBody] UnlikeDTO dto, CancellationToken cancellationToken)
+        {
+            var result = await _newsService.Unlike(dto, cancellationToken);
+            if (!result.Success)
+                return BadRequest(result);
+
+            return Ok(result);
         }
     }
 }

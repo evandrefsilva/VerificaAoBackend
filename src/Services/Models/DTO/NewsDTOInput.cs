@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
@@ -16,6 +17,7 @@ namespace Services.Models.DTO
         [Required(ErrorMessage = "The news text is required.")]
         public string Text { get; set; }
         public string CoverUrl { get; set; }
+        public IFormFile? CoverFile { get; set; } = null;
 
         public DateTime PublishedDate { get; set; }
 
@@ -30,7 +32,6 @@ namespace Services.Models.DTO
 
         public string PublishedChannel { get; set; }
         public int ReadTime { get; set; }
-        public Guid UserId { get; set; }
     }
 
 }

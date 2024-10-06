@@ -1,10 +1,6 @@
-﻿using ClosedXML.Excel;
-using Data.Context;
-using Hangfire;
+﻿using Data.Context;
 using Microsoft.EntityFrameworkCore;
-using Services.Clients;
 using Services.Enums;
-using Services.Helpers;
 using Services.Models;
 using Services.Models.DTO;
 using System;
@@ -18,22 +14,24 @@ namespace Services
 {
     public interface INewsService
     {
-        Task<AppResult> Create(NewsDTOInput news, CancellationToken cancellationToken = default);
+        Task<AppResult> Create(NewsDTOInput news, Guid publishedId, CancellationToken cancellationToken = default);
         Task<AppResult> Edit(int id, NewsDTOInput news, CancellationToken cancellationToken = default);
+        Task<AppResult> Delete(int id, CancellationToken cancellationToken = default);
         Task<AppResult> Approve(int id, CancellationToken cancellationToken = default);
         Task<AppResult> Reject(int id, CancellationToken cancellationToken = default);
         Task<AppResult> ForceReview(int id, CancellationToken cancellationToken = default);
-        AppResult GetAll(int page = 1, int take = 30, string filter = null);
-        AppResult GetAllPublished(int page = 1, int take = 30, string filter = null);
+        Task<AppResult> GetAll(int page = 1, int take = 30, string filter = null, CancellationToken cancellationToken = default);
+        Task<AppResult> GetAllPublished(int page = 1, int take = 30, string filter = null, CancellationToken cancellationToken = default);
+        Task<AppResult> GetPopularNews(int page = 1, int take = 30, CancellationToken cancellationToken = default);
         Task<AppResult> VerifyNews(int newsId, VerificationDTOInput verificationDTO, CancellationToken cancellationToken = default);
         Task<AppResult> ChangeVerificationStatus(int newsId, int verificationStatusId, CancellationToken cancellationToken = default);
 
-        // New methods added
-        AppResult GetNewsByTag(string tag, int page = 1, int take = 30);
+        Task<AppResult> GetNewsByTag(string tag, int page = 1, int take = 30, CancellationToken cancellationToken = default);
         Task<AppResult> GetNewsDetails(int id, CancellationToken cancellationToken = default);
-        AppResult GetTags();
-        AppResult GetRecentlyVerifiedPublished(int page = 1, int take = 30);
-        AppResult GetPopularNews(int page = 1, int take = 30);
+        Task<AppResult> GetRecentlyVerifiedPublished(int page = 1, int take = 30, CancellationToken cancellationToken = default);
+
+        Task<AppResult> Unlike(UnlikeDTO dto, CancellationToken cancellationToken = default);
+        Task<AppResult> Like(LikeDTO dto, CancellationToken cancellationToken = default);
     }
 
     public class NewsService : INewsService
@@ -45,7 +43,7 @@ namespace Services
             _db = db;
         }
 
-        public async Task<AppResult> Create(NewsDTOInput dto, CancellationToken cancellationToken)
+        public async Task<AppResult> Create(NewsDTOInput dto, Guid publishedId, CancellationToken cancellationToken)
         {
             var result = new AppResult();
             try
@@ -62,7 +60,7 @@ namespace Services
                     ReadTime = dto.ReadTime,
                     TagId = dto.TagId,
                     CoverUrl = dto.CoverUrl,
-                    PublishedById = dto.UserId
+                    PublishedById = publishedId
                 };
 
                 // Cria a verificação com status "Em Revisão"
@@ -70,7 +68,7 @@ namespace Services
                 {
                     News = news,
                     VerificationStatusId = 3, // "Em Revisão"
-                    RequestedById = dto.UserId,
+                    RequestedById = publishedId,
                     MainLink = dto.MainLink,
                     SecundaryLink = dto.SecundaryLink,
                     Obs = dto.Obs,
@@ -107,6 +105,29 @@ namespace Services
                 news.Text = dto.Text;
                 news.PublicationDate = DateTime.UtcNow;
                 news.CoverUrl = dto.CoverUrl;
+
+                _db.News.Update(news);
+                await _db.SaveChangesAsync(cancellationToken);
+
+                return result.Good(news.Id);
+            }
+            catch (Exception e)
+            {
+                return result.Bad(e.Message);
+            }
+        }
+
+        public async Task<AppResult> Delete(int id, CancellationToken cancellationToken)
+        {
+            var result = new AppResult();
+            try
+            {
+                var news = await _db.News.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+                if (news == null)
+                    return result.Bad("News not found");
+
+
+                news.IsDeleted = true;
 
                 _db.News.Update(news);
                 await _db.SaveChangesAsync(cancellationToken);
@@ -157,7 +178,7 @@ namespace Services
             }
         }
 
-        public AppResult GetAll(int page = 1, int take = 30, string filter = null)
+        public async Task<AppResult> GetAll(int page = 1, int take = 30, string filter = null, CancellationToken cancellationToken = default)
         {
             var result = new AppResult();
             try
@@ -165,6 +186,7 @@ namespace Services
                 var query = _db.News
                     .Include(n => n.Verification)
                     .Include(n => n.Tag)
+                    .Include(n => n.PublishedBy)
                     .Where(x => !x.IsDeleted)
                     .AsQueryable();
 
@@ -173,11 +195,12 @@ namespace Services
                     query = query.Where(x => x.Title.Contains(filter) || x.Resume.Contains(filter) || x.Text.Contains(filter));
                 }
 
-                var newsList = query
+                var newsList = await query
                     .OrderByDescending(x => x.PublicationDate)
                     .Skip((page - 1) * take)
                     .Take(take)
-                    .ToList();
+                    .Select(x => new NewsDTOOutput(x))
+                    .ToListAsync(cancellationToken);
 
                 return result.Good(newsList);
             }
@@ -187,7 +210,7 @@ namespace Services
             }
         }
 
-        public AppResult GetAllPublished(int page = 1, int take = 30, string filter = null)
+        public async Task<AppResult> GetAllPublished(int page = 1, int take = 30, string filter = null, CancellationToken cancellation = default)
         {
             var result = new AppResult();
             try
@@ -203,11 +226,11 @@ namespace Services
                     query = query.Where(x => x.Title.Contains(filter) || x.Resume.Contains(filter) || x.Text.Contains(filter));
                 }
 
-                var publishedNews = query
+                var publishedNews = await query
                     .OrderByDescending(x => x.PublicationDate)
                     .Skip((page - 1) * take)
                     .Take(take)
-                    .ToList();
+                    .ToListAsync(cancellation);
 
                 return result.Good(publishedNews);
             }
@@ -249,6 +272,48 @@ namespace Services
             }
         }
 
+        public async Task<AppResult> Like(LikeDTO dto, CancellationToken cancellationToken = default)
+        {
+            var result = new AppResult();
+            try
+            {
+                var news = await _db.News.FirstOrDefaultAsync(n => n.Id == dto.NewsId, cancellationToken);
+                if (news == null)
+                    return result.Bad("News not found");
+
+                news.Like += 1;
+                _db.News.Update(news);
+                await _db.SaveChangesAsync(cancellationToken);
+
+                return result.Good(news.Like);
+            }
+            catch (Exception e)
+            {
+                return result.Bad(e.Message);
+            }
+        }
+
+        public async Task<AppResult> Unlike(UnlikeDTO dto, CancellationToken cancellationToken = default)
+        {
+            var result = new AppResult();
+            try
+            {
+                var news = await _db.News.FirstOrDefaultAsync(n => n.Id == dto.NewsId, cancellationToken);
+                if (news == null)
+                    return result.Bad("News not found");
+
+                news.UnLike += 1;
+                _db.News.Update(news);
+                await _db.SaveChangesAsync(cancellationToken);
+
+                return result.Good(news.UnLike);
+            }
+            catch (Exception e)
+            {
+                return result.Bad(e.Message);
+            }
+        }
+
         public async Task<AppResult> ChangeVerificationStatus(int newsId, int verificationStatusId, CancellationToken cancellationToken = default)
         {
             var result = new AppResult();
@@ -276,18 +341,18 @@ namespace Services
         }
 
         // New methods implementation
-        public AppResult GetNewsByTag(string tag, int page = 1, int take = 30)
+        public async Task<AppResult> GetNewsByTag(string tag, int page = 1, int take = 30, CancellationToken cancellationToken = default)
         {
             var result = new AppResult();
             try
             {
-                var newsList = _db.News
+                var newsList = await _db.News
                     .Include(n => n.Tag)
                     .Where(n => n.Tag.Name.Equals(tag, StringComparison.OrdinalIgnoreCase) && !n.IsDeleted)
                     .OrderByDescending(n => n.PublicationDate)
                     .Skip((page - 1) * take)
                     .Take(take)
-                    .ToList();
+                    .ToListAsync(cancellationToken);
 
                 return result.Good(newsList);
             }
@@ -317,33 +382,20 @@ namespace Services
                 return result.Bad(e.Message);
             }
         }
-
-        public AppResult GetTags()
-        {
-            var result = new AppResult();
-            try
-            {
-                var tags = _db.Tags.ToList();
-                return result.Good(tags);
-            }
-            catch (Exception e)
-            {
-                return result.Bad(e.Message);
-            }
-        }
-
-        public AppResult GetRecentlyVerifiedPublished(int page = 1, int take = 30)
+        public async Task<AppResult> GetRecentlyVerifiedPublished(int page = 1, int take = 30, CancellationToken cancellationToken = default)
         {
             var result = new AppResult();
             try
             {
                 var newsList = _db.News
                     .Include(n => n.Verification)
-                    .Where(n => n.IsPublished && n.Verification.VerificationStatusId == 1 && !n.IsDeleted) // Assuming 1 is "Verified"
+                    .Where(n => n.IsPublished &&
+                                n.Verification.VerificationStatusId != (int)VerificationStatusEnum.InReview &&
+                                !n.IsDeleted) // Assuming 1 is "Verified"
                     .OrderByDescending(n => n.Verification.VerificationDate)
                     .Skip((page - 1) * take)
                     .Take(take)
-                    .ToList();
+                    .ToListAsync(cancellationToken);
 
                 return result.Good(newsList);
             }
@@ -353,17 +405,17 @@ namespace Services
             }
         }
 
-        public AppResult GetPopularNews(int page = 1, int take = 30)
+        public async Task<AppResult> GetPopularNews(int page = 1, int take = 30, CancellationToken cancellationToken = default)
         {
             var result = new AppResult();
             try
             {
-                var newsList = _db.News
+                var newsList = await _db.News
                     .Where(n => n.IsPublished && !n.IsDeleted)
                     .OrderByDescending(n => n.Like - n.UnLike) // Assuming popularity is based on likes minus unlikes
                     .Skip((page - 1) * take)
                     .Take(take)
-                    .ToList();
+                    .ToListAsync(cancellationToken);
 
                 return result.Good(newsList);
             }

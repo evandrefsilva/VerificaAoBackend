@@ -4,11 +4,11 @@ using System.Text;
 
 namespace Services.Enums
 {
-    public enum VerificationStatus
+    public enum VerificationStatusEnum
     {
-        Verdadeira = 1,
-        Falsa = 2,
-        EmRevisao = 3
+        True = 1,
+        False = 2,
+        InReview = 3
     }
 
 }

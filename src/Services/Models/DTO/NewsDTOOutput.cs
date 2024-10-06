@@ -7,15 +7,52 @@ namespace Services.Models.DTO
 {
     public class NewsDTOOutput
     {
-        public int Id { get; set; } // Identificador único da notícia
+        public NewsDTOOutput(News news)
+        {
+            Id = news.Id;
+            Title = news.Title;
+            Resume = news.Resume;
+            PublicationDate = news.PublicationDate;
+            IsPublished = news.IsPublished;
+            Like = news.Like;
+            UnLike = news.UnLike;
+            ReadTime = news.ReadTime;
+            PublishedBy = $"{news.PublishedBy?.FirstName} {news.PublishedBy?.LastName}";
+            TagName = news.Tag?.Name;
+        }
 
-        public string Title { get; set; } // Título da notícia
+        public int Id { get; set; }
 
-        public string Resume { get; set; } // Resumo da notícia
+        public string Title { get; set; }
 
-        public string Text { get; set; } // Texto completo da notícia
+        public string Resume { get; set; }
 
-        public DateTime PublicationDate { get; set; } // Data de publicação
+        public DateTime PublicationDate { get; set; }
+
+        public bool IsPublished { get; set; }
+
+        public int Like { get; set; }
+
+        public int UnLike { get; set; }
+
+        public int ReadTime { get; set; }
+
+        public string PublishedBy { get; set; }
+
+        public string TagName { get; set; }
+    }
+
+    public class NewsDetailsDTOOutput
+    {
+        public int Id { get; set; }
+
+        public string Title { get; set; }
+
+        public string Resume { get; set; }
+
+        public string Text { get; set; }
+
+        public DateTime PublicationDate { get; set; }
 
         public bool IsPublished { get; set; } // Status de publicação
 
