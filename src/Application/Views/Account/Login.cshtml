@@ -1,0 +1,52 @@
+﻿@{
+    ViewData["Title"] = "Iniciar Sessão";
+    Layout = "~/Views/Shared/_CleanLayout.cshtml";
+}
+
+<style>
+    button{
+        background: rgb(222, 65, 131) !important;
+        color: #fff !important;
+    }
+</style>
+
+<section>
+    <div class="page-header vh-100">
+        <div class="container">
+            <div class="row">
+                <div class="col-xl-4 col-lg-5 col-md-6 d-flex flex-column mx-auto position-relative">
+                        <img src="/img/logo.png" alt="Alternate Text" class="position-absolute top-0 start-0" />
+                    <div class="card card-plain mt-8">
+                        <div class="card-header pb-0 text-left bg-transparent">
+                            <h3 class="font-weight-bolder text-info text-warning">Bem-vindo de volta!</h3>
+                            <p class="mb-0">Insira seu email e palavra-passe para entrar</p>
+                        </div>
+                        <div class="card-body">
+                            <form asp-controller="account" asp-action="login" method="post">
+                                <label>Nome de utilizador</label>
+                                <div class="mb-3">
+                                    <input type="text" name="username" class="form-control" placeholder="Nome de utilizador" aria-label="Username" aria-describedby="username-addon">
+                                </div>
+                                <label>Palavra-passe</label>
+                                <div class="mb-3">
+                                    <input type="password" name="password" class="form-control" placeholder="Palavra-passe" aria-label="Password" aria-describedby="password-addon">
+                                </div>
+                                <div class="text-center">
+                                    <button type="submit" class="btn w-100 mt-4 mb-0">Entrar</button>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="card-footer text-center pt-0 px-lg-2 px-1">
+
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="oblique position-absolute top-0 h-100 d-md-block d-none me-n8">
+                        <div class="oblique-image bg-cover position-absolute fixed-top ms-auto h-100 z-index-0 ms-n6" style="background-color:rgb(222, 65, 131)"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

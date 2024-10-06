@@ -1,0 +1,83 @@
+﻿@using Services.Helpers;
+@model CandidateDTOOutput
+@{
+    ViewData["Title"] = $"{Model.Name}";
+    var statusList = CandidatureStatusExtensions.ToCandidatureStatusArray();
+    var currentStatus = statusList.FirstOrDefault(s => s.Number == Model.CandidatureStatusId);
+    var nextStatus = statusList.FirstOrDefault(s => s.Number == Model.CandidatureStatusId + 1);
+    var stage1 = statusList.FirstOrDefault(s => s.Number == 1); // Assuming 4 is the cancel status number
+}
+
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header pb-0 px-3">
+                    <h6 class="mb-0">Informações do candidato</h6>
+                    <h6 class="mb-0">Nº @Model.OrderNumber</h6>
+                    <!-- <a class="btn btn-sm bg-gradient-dark" href="/resume/@Model.OrderNumber"><i class="fa fa-print" aria-hidden="true"></i>&nbsp;&nbsp;Ver resumo</a> -->
+                </div>
+
+                <div class="card-body pt-3 p-3">
+                    <ul class="list-group">
+                        <li class="list-group-item border-0 d-flex p-4 mb-2 mt-3 bg-gray-100 border-radius-lg">
+                            <div class="d-flex flex-column">
+                                <h5 class="mb-3 text-sm">Dados do candidato</h5>
+                                <span class="mb-2 text-xs">Nome Completo:<span class="text-dark font-weight-bold ms-sm-2">@Model.Name</span></span>
+
+                                <span class="mb-2 text-xs">Telefone:<span class="text-dark font-weight-bold ms-sm-2">@Model.PhoneNumber</span></span>
+                                <span class="mb-2 text-xs">Data de Nascimento:<span class="text-dark font-weight-bold ms-sm-2">@Model.DateBorn</span></span>
+                                <span class="mb-2 text-xs">Província de Nascimento:<span class="text-dark font-weight-bold ms-sm-2">@Model.ProvinceBorn</span></span>
+
+                                <h5 class="mb-3 text-sm">Dados do Concurso</h5> 
+                                <span class="mb-2 text-xs">Horario do casting:<span class="text-dark font-weight-bold ms-sm-2">@Model.CastingScheduleDate?.ToString("dd/MM - HH:mm")</span></span>
+                                <span class="mb-2 text-xs">Interpreta:<span class="text-dark font-weight-bold ms-sm-2">@Model.Singer</span></span>
+
+                                <span class="mb-2 text-xs">Musica 1:<span class="text-dark font-weight-bold ms-sm-2">@Model.Musics1</span></span>
+                                <span class="mb-2 text-xs">Musica 2:<span class="text-dark font-weight-bold ms-sm-2">@Model.Musics2</span></span>
+                                <span class="mb-2 text-xs">Musica 3:<span class="text-dark font-weight-bold ms-sm-2">@Model.Musics3</span></span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="">
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6 class="">Etapa Atual:</h6>
+                                @if (currentStatus != null)
+                                {
+                                    <span class="badge badge-sm @currentStatus.CssClass">@currentStatus.Description</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            @if (stage1 != null && currentStatus.Number != stage1.Number)
+                            {
+                                <div class="col-6 mb-2">
+                                    <a class="btn btn-sm text-white @stage1.CssClass w-100" href="@Url.Action("ChangeState", new { id = Model.Id, statusId = stage1.Number })">
+                                        <i class="fas fa-times" aria-hidden="true"></i>&nbsp;&nbsp;Fase Inicial
+                                    </a>
+                                </div>
+                            }
+                            @if (nextStatus != null && nextStatus.Number != 4)
+                            {
+                                <div class="col-6 mb-2">
+                                    <a class="btn btn-sm w-100 btn-success" href="@Url.Action("ChangeState", new { id = Model.Id, statusId = nextStatus.Number })">
+                                        <i class="fas fa-arrow-right" aria-hidden="true"></i>&nbsp;&nbsp;Aprovar
+                                    </a>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
