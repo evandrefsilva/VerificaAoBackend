@@ -23,6 +23,7 @@ namespace Services
         Task<AppResult> Register(RegisterUserDTO dto);
         Task<AppResult> RecoverPassword(RecoveryPasswordDTO dto);
         Task<AppResult> RequestVerifyEmail(RequestVerifyEmailDTO dto);
+        Task<AppResult> RequestUpdatePassword(RequestVerifyEmailDTO dto);
         Task<AppResult> VerifyEmail(VerifyEmailDTO dto);
         Task<AppResult> UpdatePassword(UpdatePasswordDTO dto); // Novo método para atualizar a senha
     }
@@ -115,6 +116,28 @@ namespace Services
 
             return res.Good("Código de verificação enviado.");
         }
+        public async Task<AppResult> RequestUpdatePassword(RequestVerifyEmailDTO dto)
+        {
+            var res = new AppResult();
+            var user = await _db.Users.FirstOrDefaultAsync(x => x.Email == dto.Email);
+
+            if (user == null)
+                return res.Bad("Usuário não encontrado.");
+
+            // Gerar código de verificação (pode ser um código simples ou algo mais complexo)
+            var verifyCode = new Random().Next(100000, 999999).ToString();
+
+            user.VerifyCode = verifyCode;
+            _db.Users.Update(user);
+            await _db.SaveChangesAsync();
+
+            // Lógica para enviar e-mail
+            var subject = "Use o código abaixo";
+            var body = $"Use o código abaixo para verficar o senhor: {verifyCode}";
+
+            return res.Good("Código de verificação enviado.");
+        }
+
         public async Task<AppResult> VerifyEmail(VerifyEmailDTO dto)
         {
             var res = new AppResult();

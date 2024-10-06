@@ -40,8 +40,7 @@ namespace API.Controllers
 
             return BadRequest(result); 
         }
-
-        [HttpPost("recover-password")]
+          [HttpPost("recover-password")]
         public async Task<ActionResult<AppResult>> RecoverPassword([FromBody] RecoveryPasswordDTO recoveryDto)
         {
             var result = await _userService.RecoverPassword(recoveryDto);
@@ -52,7 +51,28 @@ namespace API.Controllers
 
             return BadRequest(result); 
         }
+        [HttpPost("request-update-password")]
+        public async Task<ActionResult<AppResult>> RequestUpdatePassword([FromBody] RequestVerifyEmailDTO requestVerifyEmailDTO)
+        {
+            var result = await _userService.RequestUpdatePassword(requestVerifyEmailDTO);
+            if (result.Success)
+            {
+                return Ok(result);
+            }
 
+            return BadRequest(result);
+        }
+        [HttpPost("request-verify-email")]
+        public async Task<ActionResult<AppResult>> VerifyEmail([FromBody] RequestVerifyEmailDTO requestVerifyEmailDTO)
+        {
+            var result = await _userService.RequestVerifyEmail(requestVerifyEmailDTO);
+            if (result.Success)
+            {
+                return Ok(result);
+            }
+
+            return BadRequest(result);
+        }
         [HttpPost("verify-email")]
         public async Task<ActionResult<AppResult>> VerifyEmail([FromBody] VerifyEmailDTO verifyDto)
         {
