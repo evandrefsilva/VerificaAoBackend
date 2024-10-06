@@ -37,7 +37,7 @@ namespace Services
         public UserService(DataContext db)
         {
             _db = db;
-            _jwtSecret = "secret";
+            _jwtSecret = "supersgredodotoken";
         }
 
         public AppResult Login(LoginDTO dto)
@@ -191,8 +191,8 @@ namespace Services
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
-                issuer: null,
-                audience: null,
+                issuer: "verficca",
+                audience: "verifica",
                 claims: claims,
                 expires: DateTime.Now.AddMinutes(30),
                 signingCredentials: creds);
