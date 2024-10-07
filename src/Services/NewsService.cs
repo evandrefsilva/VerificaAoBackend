@@ -83,20 +83,24 @@ namespace Services
                 var verifications = await _db.Verifications
                     .Include(v => v.News) // Inclui os dados da notícia relacionada
                     .Include(v => v.VerificationStatus) // Inclui o status da verificação
+                    .Include(v => v.RequestedBy)
+                    .Include(v => v.VerifiedBy)
                     .Skip((page - 1) * take)
                     .Take(take)
                     .Select(v => new VerificationDTOOutput
                     {
                         Id = v.Id,
-                        NewsTitle = v.News.Title,
                         VerificationStatusId = v.VerificationStatusId,
                         VerificationStatus = v.VerificationStatus.Name, // Assumindo que exista uma propriedade `Name`
                         RequestedBy = v.RequestedBy.Username, // Assumindo que o Requester seja um User
                         RequestedDate = v.CreatedAt, // Propriedade que armazena a data da solicitação
                         MainLink = v.MainLink,
                         SecundaryLink = v.SecundaryLink,
+                        PublishedDate = v.PublishedDate,
+                        PublishedTile = v.PublishedTitle,
+                        PublishedChannel = v.PublishedChannel,
                         Obs = v.Obs,
-                        PublishedChannel = v.PublishedChannel
+                        VerifiedByName = v.VerifiedBy.GetFullName(),
                     })
                     .ToListAsync(cancellationToken);
 

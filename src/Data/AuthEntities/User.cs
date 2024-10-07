@@ -19,5 +19,11 @@ namespace Data.AuthEntities
         public string VerifyCode { get; set; }
         public DateTime VerifyCodeDate { get; set; }
         public Role Role { get; set; }
+
+        public string GetFullName()
+        {
+            return $"{FirstName} {LastName}";
+        }
+
     }
 }
