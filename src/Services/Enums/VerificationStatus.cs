@@ -8,7 +8,8 @@ namespace Services.Enums
     {
         True = 1,
         False = 2,
-        InReview = 3
+        InReview = 3,
+        Pending = 4
     }
 
 }

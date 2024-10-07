@@ -73,21 +73,6 @@ namespace Application.Areas.V1.Controllers
                 return Ok(result);
             return BadRequest(result);
         }
-
-        // 4. Verificar uma notícia
-        [HttpPost("{newsId}/verify")]
-        //[Authorize]
-        public async Task<IActionResult> VerifyNews(int newsId, [FromBody] VerificationDTOInput verificationDTO, CancellationToken cancellationToken)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var result = await _newsService.VerifyNews(newsId, verificationDTO, cancellationToken);
-            if (result.Success)
-                return Ok(result);
-            return BadRequest(result);
-        }
-
         // 5. Listar notícias publicadas
         [HttpGet("published")]
         [AllowAnonymous]

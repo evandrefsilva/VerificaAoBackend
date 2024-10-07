@@ -15,6 +15,7 @@ namespace Services
     public interface INewsService
     {
         Task<AppResult> Create(NewsDTOInput news, Guid publishedId, CancellationToken cancellationToken = default);
+        Task<AppResult> CreateVerification(VerificationDTOInput news, Guid requestedById, CancellationToken cancellationToken = default);
         Task<AppResult> Edit(int id, NewsDTOInput news, CancellationToken cancellationToken = default);
         Task<AppResult> Delete(int id, CancellationToken cancellationToken = default);
         Task<AppResult> Approve(int id, CancellationToken cancellationToken = default);
@@ -23,7 +24,7 @@ namespace Services
         Task<AppResult> GetAll(int page = 1, int take = 30, string filter = null, CancellationToken cancellationToken = default);
         Task<AppResult> GetAllPublished(int page = 1, int take = 30, string filter = null, CancellationToken cancellationToken = default);
         Task<AppResult> GetPopularNews(int page = 1, int take = 30, CancellationToken cancellationToken = default);
-        Task<AppResult> VerifyNews(int newsId, VerificationDTOInput verificationDTO, CancellationToken cancellationToken = default);
+        //Task<AppResult> VerifyNews(int newsId, VerificationDTOInput verificationDTO, CancellationToken cancellationToken = default);
         Task<AppResult> ChangeVerificationStatus(int newsId, int verificationStatusId, CancellationToken cancellationToken = default);
 
         Task<AppResult> GetNewsByTag(string tag, int page = 1, int take = 30, CancellationToken cancellationToken = default);
@@ -42,7 +43,6 @@ namespace Services
         {
             _db = db;
         }
-
         public async Task<AppResult> Create(NewsDTOInput dto, Guid publishedId, CancellationToken cancellationToken)
         {
             var result = new AppResult();
@@ -63,23 +63,7 @@ namespace Services
                     PublishedById = publishedId
                 };
 
-                // Cria a verificação com status "Em Revisão"
-                var verification = new Verification
-                {
-                    News = news,
-                    VerificationStatusId = 3, // "Em Revisão"
-                    RequestedById = publishedId,
-                    MainLink = dto.MainLink,
-                    SecundaryLink = dto.SecundaryLink,
-                    Obs = dto.Obs,
-                    PublishedChannel = dto.PublishedChannel,
-                    PublishedDate = dto.PublishedDate
-                };
-
-                // Associa a verificação à notícia
-                news.Verification = verification;
-
-                // Salva a notícia e a verificação
+                // Salva a notícia no banco
                 await _db.News.AddAsync(news, cancellationToken);
                 await _db.SaveChangesAsync(cancellationToken);
 
@@ -90,7 +74,34 @@ namespace Services
                 return result.Bad(e.Message);
             }
         }
+        public async Task<AppResult> CreateVerification(VerificationDTOInput dto,  Guid requestedById, CancellationToken cancellationToken)
+        {
+            var result = new AppResult();
+            try
+            {
+                var verification = new Verification
+                {
+                    PublishedTitle = dto.PublishedTitle,
+                    VerificationStatusId = (int)VerificationStatusEnum.Pending, // "Em Revisão"
+                    RequestedById = requestedById,
+                    MainLink = dto.MainLink,
+                    SecundaryLink = dto.SecundaryLink,
+                    Obs = dto.Obs,
+                    PublishedChannel = dto.PublishedChannel,
+                    PublishedDate = dto.PublishedDate
+                };
 
+                // Associa a verificação à notícia e salva no banco
+                await _db.Verifications.AddAsync(verification, cancellationToken);
+                await _db.SaveChangesAsync(cancellationToken);
+
+                return result.Good("Verification created successfully.");
+            }
+            catch (Exception e)
+            {
+                return result.Bad(e.Message);
+            }
+        }
         public async Task<AppResult> Edit(int id, NewsDTOInput dto, CancellationToken cancellationToken)
         {
             var result = new AppResult();
@@ -240,38 +251,7 @@ namespace Services
             }
         }
 
-        public async Task<AppResult> VerifyNews(int newsId, VerificationDTOInput verificationDTO, CancellationToken cancellationToken = default)
-        {
-            var result = new AppResult();
-            try
-            {
-                var news = await _db.News.FirstOrDefaultAsync(x => x.Id == newsId, cancellationToken);
-                if (news == null)
-                    return result.Bad("News not found");
-
-                var verification = new Verification
-                {
-                    News = news,
-                    VerificationStatusId = 3, // "Em Revisão"
-                    RequestedById = verificationDTO.RequestedByUserId,
-                    MainLink = verificationDTO.MainLink,
-                    SecundaryLink = verificationDTO.SecundaryLink,
-                    Obs = verificationDTO.Obs,
-                    PublishedChannel = verificationDTO.PublishedChannel,
-                    PublishedDate = verificationDTO.PublishedDate
-                };
-
-                await _db.Verifications.AddAsync(verification, cancellationToken);
-                await _db.SaveChangesAsync(cancellationToken);
-
-                return result.Good(verification.Id);
-            }
-            catch (Exception e)
-            {
-                return result.Bad(e.Message);
-            }
-        }
-
+      
         public async Task<AppResult> Like(LikeDTO dto, CancellationToken cancellationToken = default)
         {
             var result = new AppResult();

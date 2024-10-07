@@ -13,7 +13,8 @@ namespace Data.Configuration
             builder.HasData(
                 new VerificationStatus { Id = 1, Name = "Verdadeira"},
                 new VerificationStatus { Id = 2, Name = "Falsa" },
-                new VerificationStatus { Id = 3, Name = "Em Revisao" }
+                new VerificationStatus { Id = 3, Name = "Em Revisao" },
+                new VerificationStatus { Id = 4, Name = "Pendente Revisão" }
             );
         }
     }

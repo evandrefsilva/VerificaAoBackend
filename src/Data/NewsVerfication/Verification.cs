@@ -10,7 +10,6 @@ namespace Data.NewsVerfication
     {
         public int VerificationStatusId { get; set; }
         public VerificationStatus VerificationStatus { get; set; }
-
         public Guid? VerifiedById { get; set; }
         public User VerifiedBy { get; set; }
 
@@ -22,7 +21,7 @@ namespace Data.NewsVerfication
         public string MainLink { get; set; }
         public string SecundaryLink { get; set; }
         public string Obs { get; set; }
-        public string Attachment { get; set; }
+        public string Attachments { get; set; }
 
         public string PublishedTitle { get; set; }
         public string PublishedChannel { get; set; }

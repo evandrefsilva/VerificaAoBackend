@@ -16,6 +16,7 @@ namespace Services.Models.DTO
 
         [Required(ErrorMessage = "The news text is required.")]
         public string Text { get; set; }
+
         public string CoverUrl { get; set; }
         public IFormFile? CoverFile { get; set; } = null;
 
@@ -24,14 +25,21 @@ namespace Services.Models.DTO
         [Required(ErrorMessage = "The tag id is required.")]
         public int TagId { get; set; }
 
-        public string MainLink { get; set; }
-
-        public string SecundaryLink { get; set; }
-
-        public string Obs { get; set; }
-
-        public string PublishedChannel { get; set; }
         public int ReadTime { get; set; }
+        public int? VerficationId { get; set; } = 0;
     }
+
+    public class VerificationDTOInput
+    {
+        public string MainLink { get; set; }
+        public string SecundaryLink { get; set; }
+        public string Obs { get; set; }
+        public DateTime PublishedDate { get; set; }
+        public string PublishedTitle { get; set; }
+        public string PublishedChannel { get; set; }
+        public List<IFormFile> Attachment { get; set; }
+    }
+
+
 
 }
