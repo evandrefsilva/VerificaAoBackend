@@ -25,6 +25,7 @@ namespace Services
         Task<AppResult> GetAllPublished(int page = 1, int take = 30, string filter = null, CancellationToken cancellationToken = default);
         Task<AppResult> GetPopularNews(int page = 1, int take = 30, CancellationToken cancellationToken = default);
         //Task<AppResult> VerifyNews(int newsId, VerificationDTOInput verificationDTO, CancellationToken cancellationToken = default);
+        Task<AppResult> GetAllVerfications(int page = 1, int take = 30, CancellationToken cancellationToken = default);
         Task<AppResult> ChangeVerificationStatus(int newsId, int verificationStatusId, CancellationToken cancellationToken = default);
 
         Task<AppResult> GetNewsByTag(string tag, int page = 1, int take = 30, CancellationToken cancellationToken = default);
@@ -74,7 +75,40 @@ namespace Services
                 return result.Bad(e.Message);
             }
         }
-        public async Task<AppResult> CreateVerification(VerificationDTOInput dto,  Guid requestedById, CancellationToken cancellationToken)
+        public async Task<AppResult> GetAllVerfications(int page = 1, int take = 30, CancellationToken cancellationToken = default)
+        {
+            var result = new AppResult();
+            try
+            {
+                var verifications = await _db.Verifications
+                    .Include(v => v.News) // Inclui os dados da notícia relacionada
+                    .Include(v => v.VerificationStatus) // Inclui o status da verificação
+                    .Skip((page - 1) * take)
+                    .Take(take)
+                    .Select(v => new VerificationDTOOutput
+                    {
+                        Id = v.Id,
+                        NewsTitle = v.News.Title,
+                        VerificationStatusId = v.VerificationStatusId,
+                        VerificationStatus = v.VerificationStatus.Name, // Assumindo que exista uma propriedade `Name`
+                        RequestedBy = v.RequestedBy.Username, // Assumindo que o Requester seja um User
+                        RequestedDate = v.CreatedAt, // Propriedade que armazena a data da solicitação
+                        MainLink = v.MainLink,
+                        SecundaryLink = v.SecundaryLink,
+                        Obs = v.Obs,
+                        PublishedChannel = v.PublishedChannel
+                    })
+                    .ToListAsync(cancellationToken);
+
+                return result.Good(verifications);
+            }
+            catch (Exception e)
+            {
+                return result.Bad(e.Message);
+            }
+        }
+
+        public async Task<AppResult> CreateVerification(VerificationDTOInput dto, Guid requestedById, CancellationToken cancellationToken)
         {
             var result = new AppResult();
             try
@@ -251,7 +285,7 @@ namespace Services
             }
         }
 
-      
+
         public async Task<AppResult> Like(LikeDTO dto, CancellationToken cancellationToken = default)
         {
             var result = new AppResult();

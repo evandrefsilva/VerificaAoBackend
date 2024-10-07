@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Application.Areas.V1.Controllers;
+using Microsoft.AspNetCore.Mvc;
 using Services;
 using Services.Models;
 using Services.Models.DTO;
@@ -6,9 +7,8 @@ using System.Threading.Tasks;
 
 namespace API.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
-    public class AuthController : ControllerBase
+    public class AuthController : BaseController
     {
         private readonly IUserService _userService;
 

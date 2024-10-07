@@ -17,6 +17,15 @@ namespace Application.Areas.V1.Controllers
         {
             _newsService = newsService;
         }
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetAllVerifications(int page = 1, int take = 30, string filter = null)
+        {
+            var result = await _newsService.GetAllVerfications(page, take);
+            if (result.Success)
+                return Ok(result);
+            return BadRequest(result);
+        }
 
         // 4. Verificar uma notícia
         [HttpPost("request")]

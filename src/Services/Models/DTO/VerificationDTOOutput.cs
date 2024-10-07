@@ -7,22 +7,16 @@ namespace Services.Models.DTO
 {
     public class VerificationDTOOutput
     {
-        public int Id { get; set; } // Identificador único da verificação
-
-        public string VerificationStatus { get; set; } // Status da verificação (e.g., "Em Revisão", "Verdadeira", "Falsa")
-
-        public string VerifiedBy { get; set; } // Nome do usuário que fez a verificação (se aplicável)
-
-        public DateTime? VerificationDate { get; set; } // Data em que a verificação foi feita
-
-        public string MainLink { get; set; } // Link principal associado à verificação
-
-        public string SecundaryLink { get; set; } // Link secundário associado à verificação
-
-        public string Obs { get; set; } // Observações feitas durante a verificação
-
-        public string PublishedChannel { get; set; } // Canal de publicação original da notícia verificada
-
-        public DateTime? PublishedDate { get; set; } // Data de publicação da notícia verificada
+        public int Id { get; set; }
+        public int NewsId { get; set; }
+        public string NewsTitle { get; set; }
+        public int VerificationStatusId { get; set; }
+        public string VerificationStatus { get; set; }
+        public string RequestedBy { get; set; }
+        public DateTime RequestedDate { get; set; }
+        public string MainLink { get; set; }
+        public string SecundaryLink { get; set; }
+        public string Obs { get; set; }
+        public string PublishedChannel { get; set; }
     }
 }

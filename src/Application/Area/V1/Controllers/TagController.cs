@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 
 namespace Application.Area.V1.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
     //[Authorize(Roles = "Admin, Manager")]
     public class TagController : BaseController
