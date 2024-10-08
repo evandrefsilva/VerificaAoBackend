@@ -21,21 +21,7 @@ namespace Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Role",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Slug = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Role", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Tags",
+                name: "Categories",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -48,7 +34,21 @@ namespace Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Tags", x => x.Id);
+                    table.PrimaryKey("PK_Categories", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Role",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Slug = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Role", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -96,6 +96,32 @@ namespace Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "UserCategories",
+                columns: table => new
+                {
+                    UserId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CategoryId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserCategories", x => x.UserId);
+                    table.ForeignKey(
+                        name: "FK_UserCategories_Categories_CategoryId",
+                        column: x => x.CategoryId,
+                        principalTable: "Categories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_UserCategories_Users_UserId1",
+                        column: x => x.UserId1,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Verifications",
                 columns: table => new
                 {
@@ -107,7 +133,7 @@ namespace Data.Migrations
                     MainLink = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     SecundaryLink = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Obs = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Attachment = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Attachments = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PublishedTitle = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PublishedChannel = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PublishedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -157,7 +183,7 @@ namespace Data.Migrations
                     PublishedById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ReadTime = table.Column<int>(type: "int", nullable: false),
                     VerificationId = table.Column<int>(type: "int", nullable: false),
-                    TagId = table.Column<int>(type: "int", nullable: false),
+                    CategoryId = table.Column<int>(type: "int", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
@@ -167,9 +193,9 @@ namespace Data.Migrations
                 {
                     table.PrimaryKey("PK_News", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_News_Tags_TagId",
-                        column: x => x.TagId,
-                        principalTable: "Tags",
+                        name: "FK_News_Categories_CategoryId",
+                        column: x => x.CategoryId,
+                        principalTable: "Categories",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
@@ -210,13 +236,19 @@ namespace Data.Migrations
                 {
                     { 1, "Verdadeira" },
                     { 2, "Falsa" },
-                    { 3, "Em Revisao" }
+                    { 3, "Em Revisao" },
+                    { 4, "Pendente Revisão" }
                 });
 
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "Id", "CreatedAt", "Email", "FirstName", "IsActive", "IsDeleted", "IsEmailVerified", "LastName", "Password", "ProfilePicture", "RoleId", "UpdatedAt", "Username", "VerifyCode", "VerifyCodeDate" },
-                values: new object[] { new Guid("11111111-1111-1111-1111-111111111111"), new DateTime(2024, 10, 6, 11, 41, 12, 863, DateTimeKind.Utc).AddTicks(1737), "admin@admin.com", "Administrador de Sistema", true, false, false, "Administrador de Sistema", "0f3d85258d593088098f65c26e89d49bf1bcf29b2b57dcfc36865ecefec7551fb8f232a028d98bd39acfb2710ef5e6e8f08e5a4ddbc213a82ad6008e64861abd", null, 1, null, "admin", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) });
+                values: new object[] { new Guid("11111111-1111-1111-1111-111111111111"), new DateTime(2024, 10, 8, 14, 41, 51, 650, DateTimeKind.Utc).AddTicks(9162), "admin@admin.com", "Administrador de Sistema", true, false, false, "Administrador de Sistema", "0f3d85258d593088098f65c26e89d49bf1bcf29b2b57dcfc36865ecefec7551fb8f232a028d98bd39acfb2710ef5e6e8f08e5a4ddbc213a82ad6008e64861abd", null, 1, null, "admin", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_News_CategoryId",
+                table: "News",
+                column: "CategoryId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_News_PublishedById",
@@ -224,15 +256,20 @@ namespace Data.Migrations
                 column: "PublishedById");
 
             migrationBuilder.CreateIndex(
-                name: "IX_News_TagId",
-                table: "News",
-                column: "TagId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_News_VerificationId",
                 table: "News",
                 column: "VerificationId",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserCategories_CategoryId",
+                table: "UserCategories",
+                column: "CategoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserCategories_UserId1",
+                table: "UserCategories",
+                column: "UserId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Users_RoleId",
@@ -264,10 +301,13 @@ namespace Data.Migrations
                 name: "News");
 
             migrationBuilder.DropTable(
-                name: "Tags");
+                name: "UserCategories");
 
             migrationBuilder.DropTable(
                 name: "Verifications");
+
+            migrationBuilder.DropTable(
+                name: "Categories");
 
             migrationBuilder.DropTable(
                 name: "Users");

@@ -59,7 +59,7 @@ namespace Services
                     Like = 0,
                     UnLike = 0,
                     ReadTime = dto.ReadTime,
-                    TagId = dto.TagId,
+                    CategoryId = dto.CategoryId,
                     CoverUrl = dto.CoverUrl,
                     PublishedById = publishedId
                 };
@@ -100,7 +100,8 @@ namespace Services
                         PublishedTile = v.PublishedTitle,
                         PublishedChannel = v.PublishedChannel,
                         Obs = v.Obs,
-                        VerifiedByName = v.VerifiedBy.GetFullName(),
+                        VerifiedByName = v.VerifiedBy == null ?
+                                                "" : v.VerifiedBy.GetFullName(),
                     })
                     .ToListAsync(cancellationToken);
 
@@ -234,7 +235,7 @@ namespace Services
             {
                 var query = _db.News
                     .Include(n => n.Verification)
-                    .Include(n => n.Tag)
+                    .Include(n => n.Category)
                     .Include(n => n.PublishedBy)
                     .Where(x => !x.IsDeleted)
                     .AsQueryable();
@@ -266,7 +267,7 @@ namespace Services
             {
                 var query = _db.News
                     .Include(n => n.Verification)
-                    .Include(n => n.Tag)
+                    .Include(n => n.Category)
                     .Where(x => x.IsPublished && !x.IsDeleted)
                     .AsQueryable();
 
@@ -365,8 +366,8 @@ namespace Services
             try
             {
                 var newsList = await _db.News
-                    .Include(n => n.Tag)
-                    .Where(n => n.Tag.Name.Equals(tag, StringComparison.OrdinalIgnoreCase) && !n.IsDeleted)
+                    .Include(n => n.Category)
+                    .Where(n => n.Category.Name.Equals(tag, StringComparison.OrdinalIgnoreCase) && !n.IsDeleted)
                     .OrderByDescending(n => n.PublicationDate)
                     .Skip((page - 1) * take)
                     .Take(take)
@@ -387,7 +388,7 @@ namespace Services
             {
                 var news = await _db.News
                     .Include(n => n.Verification)
-                    .Include(n => n.Tag)
+                    .Include(n => n.Category)
                     .FirstOrDefaultAsync(n => n.Id == id && !n.IsDeleted, cancellationToken);
 
                 if (news == null)

@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20241006114113_initialDb")]
+    [Migration("20241008144152_initialDb")]
     partial class initialDb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -125,7 +125,7 @@ namespace Data.Migrations
                         new
                         {
                             Id = new Guid("11111111-1111-1111-1111-111111111111"),
-                            CreatedAt = new DateTime(2024, 10, 6, 11, 41, 12, 863, DateTimeKind.Utc).AddTicks(1737),
+                            CreatedAt = new DateTime(2024, 10, 8, 14, 41, 51, 650, DateTimeKind.Utc).AddTicks(9162),
                             Email = "admin@admin.com",
                             FirstName = "Administrador de Sistema",
                             IsActive = true,
@@ -166,12 +166,43 @@ namespace Data.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Data.NewsVerfication.Category", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .UseIdentityColumn();
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Categories");
+                });
+
             modelBuilder.Entity("Data.NewsVerfication.News", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .UseIdentityColumn();
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
 
                     b.Property<string>("CoverUrl")
                         .HasColumnType("nvarchar(max)");
@@ -204,9 +235,6 @@ namespace Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("TagId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Text")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -226,9 +254,9 @@ namespace Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PublishedById");
+                    b.HasIndex("CategoryId");
 
-                    b.HasIndex("TagId");
+                    b.HasIndex("PublishedById");
 
                     b.HasIndex("VerificationId")
                         .IsUnique();
@@ -236,32 +264,26 @@ namespace Data.Migrations
                     b.ToTable("News");
                 });
 
-            modelBuilder.Entity("Data.NewsVerfication.Tag", b =>
+            modelBuilder.Entity("Data.NewsVerfication.UserCategory", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("UserId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .UseIdentityColumn();
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
+                    b.Property<Guid?>("UserId1")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                    b.HasKey("UserId");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.HasIndex("CategoryId");
 
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
+                    b.HasIndex("UserId1");
 
-                    b.HasKey("Id");
-
-                    b.ToTable("Tags");
+                    b.ToTable("UserCategories");
                 });
 
             modelBuilder.Entity("Data.NewsVerfication.Verification", b =>
@@ -271,7 +293,7 @@ namespace Data.Migrations
                         .HasColumnType("int")
                         .UseIdentityColumn();
 
-                    b.Property<string>("Attachment")
+                    b.Property<string>("Attachments")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedAt")
@@ -357,6 +379,11 @@ namespace Data.Migrations
                         {
                             Id = 3,
                             Name = "Em Revisao"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Name = "Pendente Revisão"
                         });
                 });
 
@@ -373,15 +400,15 @@ namespace Data.Migrations
 
             modelBuilder.Entity("Data.NewsVerfication.News", b =>
                 {
-                    b.HasOne("Data.AuthEntities.User", "PublishedBy")
-                        .WithMany()
-                        .HasForeignKey("PublishedById")
+                    b.HasOne("Data.NewsVerfication.Category", "Category")
+                        .WithMany("NewsArticles")
+                        .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Data.NewsVerfication.Tag", "Tag")
-                        .WithMany("NewsArticles")
-                        .HasForeignKey("TagId")
+                    b.HasOne("Data.AuthEntities.User", "PublishedBy")
+                        .WithMany()
+                        .HasForeignKey("PublishedById")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -391,11 +418,28 @@ namespace Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.Navigation("Category");
+
                     b.Navigation("PublishedBy");
 
-                    b.Navigation("Tag");
-
                     b.Navigation("Verification");
+                });
+
+            modelBuilder.Entity("Data.NewsVerfication.UserCategory", b =>
+                {
+                    b.HasOne("Data.NewsVerfication.Category", "Category")
+                        .WithMany("UserCategories")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Data.AuthEntities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId1");
+
+                    b.Navigation("Category");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Data.NewsVerfication.Verification", b =>
@@ -423,9 +467,11 @@ namespace Data.Migrations
                     b.Navigation("VerifiedBy");
                 });
 
-            modelBuilder.Entity("Data.NewsVerfication.Tag", b =>
+            modelBuilder.Entity("Data.NewsVerfication.Category", b =>
                 {
                     b.Navigation("NewsArticles");
+
+                    b.Navigation("UserCategories");
                 });
 
             modelBuilder.Entity("Data.NewsVerfication.Verification", b =>

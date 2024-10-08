@@ -18,7 +18,6 @@ namespace Application.Areas.V1.Controllers
             _newsService = newsService;
         }
         [HttpGet]
-        [AllowAnonymous]
         public async Task<IActionResult> GetAllVerifications(int page = 1, int take = 30, string filter = null)
         {
             var result = await _newsService.GetAllVerfications(page, take);

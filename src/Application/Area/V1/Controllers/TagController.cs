@@ -10,20 +10,20 @@ namespace Application.Area.V1.Controllers
 {
     [ApiController]
     //[Authorize(Roles = "Admin, Manager")]
-    public class TagController : BaseController
+    public class CategoryController : BaseController
     {
-        private readonly ITagService _tagService;
+        private readonly ICategoryService _categoryService;
 
-        public TagController(ITagService tagService)
+        public CategoryController(ICategoryService tagService)
         {
-            _tagService = tagService;
+            _categoryService = tagService;
         }
 
         // Criar uma nova tag
         [HttpPost]
-        public async Task<IActionResult> CreateTag([FromBody] CreateTagDTO dto)
+        public async Task<IActionResult> CreateCategory([FromBody] CreateCategoryDTO dto)
         {
-            var result = await _tagService.CreateTag(dto);
+            var result = await _categoryService.CreateCategory(dto);
             if (!result.Success)
                 return BadRequest(result);
 
@@ -32,9 +32,9 @@ namespace Application.Area.V1.Controllers
 
         // Atualizar uma tag
         [HttpPut]
-        public async Task<IActionResult> UpdateTag([FromBody] UpdateTagDTO dto)
+        public async Task<IActionResult> UpdateCategory([FromBody] UpdateCategoryDTO dto)
         {
-            var result = await _tagService.UpdateTag(dto);
+            var result = await _categoryService.UpdateCategory(dto);
             if (!result.Success)
                 return BadRequest(result);
 
@@ -43,31 +43,40 @@ namespace Application.Area.V1.Controllers
 
         // Apagar uma tag
         [HttpDelete]
-        public async Task<IActionResult> DeleteTag(int id)
+        public async Task<IActionResult> DeleteCategory(int id)
         {
-            var result = await _tagService.DeleteTag(id);
+            var result = await _categoryService.DeleteCategory(id);
             if (!result.Success)
                 return BadRequest(result);
 
             return Ok(result);
         }
 
-        //// Adicionar tag a um item
-        //[HttpPost("add-to-item")]
-        //public async Task<IActionResult> AddTagToItem([FromBody] AddTagToItemDTO dto)
-        //{
-        //    var result = await _tagService.AddTagToItem(dto);
-        //    if (!result.Success)
-        //        return BadRequest(result.Message);
+        // Adicionar tag a um item
+        [HttpPost("{categoryId}/users{userId}")]
+        public async Task<IActionResult> AddCategoryToItem([FromBody] AssociateUserCategoryDTO dto)
+        {
+            var result = await _categoryService.AssociateUserWithCategory(dto);
+            if (!result.Success)
+                return BadRequest(result.Message);
 
-        //    return Ok(result.Message);
-        //}
+            return Ok(result.Message);
+        }
+        // Adicionar tag a um item
+        [HttpDelete("{categoryId}/users{userId}")]
+        public async Task<IActionResult> RemoveCategoryToItem([FromBody] AssociateUserCategoryDTO dto)
+        {
+            var result = await _categoryService.AssociateUserWithCategory(dto);
+            if (!result.Success)
+                return BadRequest(result.Message);
 
+            return Ok(result.Message);
+        }
         // Listar todas as tags
         [HttpGet]
-        public async Task<IActionResult> GetAllTags()
+        public async Task<IActionResult> GetAllCategorys()
         {
-            var result = await _tagService.GetAllTags();
+            var result = await _categoryService.GetAllCategorys();
             if (!result.Success)
                 return BadRequest(result);
 
@@ -76,9 +85,9 @@ namespace Application.Area.V1.Controllers
 
         // Listar tags ativas
         [HttpGet("active")]
-        public async Task<IActionResult> GetActiveTags()
+        public async Task<IActionResult> GetActiveCategorys()
         {
-            var result = await _tagService.GetActiveTags();
+            var result = await _categoryService.GetActiveCategorys();
             if (!result.Success)
                 return BadRequest(result);
 
@@ -87,20 +96,20 @@ namespace Application.Area.V1.Controllers
 
         // Tornar uma tag ativa ou inativa
         [HttpPut("toggle-status/{id}")]
-        public async Task<IActionResult> ToggleTagStatus(int id)
+        public async Task<IActionResult> ToggleCategoryStatus(int id)
         {
-            var tagResul = await _tagService.GetTagById(id);
+            var tagResul = await _categoryService.GetCategoryById(id);
             if (!tagResul.Success)
                 return BadRequest(tagResul);
-            var tag = (TagDTO)tagResul.Object;
-            var updateDto = new UpdateTagDTO
+            var tag = (CategoryDTO)tagResul.Object;
+            var updateDto = new UpdateCategoryDTO
             {
                 Id = id,
                 Name = tag.Name,
                 IsActive = !tag.IsActive
             };
 
-            var result = await _tagService.UpdateTag(updateDto);
+            var result = await _categoryService.UpdateCategory(updateDto);
             if (!result.Success)
                 return BadRequest(result);
 

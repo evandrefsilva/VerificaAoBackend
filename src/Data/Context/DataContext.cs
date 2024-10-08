@@ -35,8 +35,9 @@ namespace Data.Context
         public DbSet<User> Users { get; set; }
         public DbSet<AppSettings> AppConfigurations { get; set; }
         public DbSet<News> News { get; set; }
-        public DbSet<Tag> Tags{ get; set; }
-        public DbSet<Verification> Verifications{ get; set; }
-        public DbSet<VerificationStatus> VerificationStatus{ get; set; }
+        public DbSet<Category> Categories { get; set; }
+        public DbSet<UserCategory> UserCategories { get; set; }
+        public DbSet<Verification> Verifications { get; set; }
+        public DbSet<VerificationStatus> VerificationStatus { get; set; }
     }
 }

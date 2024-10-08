@@ -29,8 +29,8 @@ namespace Data.NewsVerfication
         public int VerificationId { get; set; }
         public virtual Verification Verification { get; set; }
 
-        public int TagId { get; set; }
-        public virtual Tag Tag { get; set; }
+        public int CategoryId { get; set; }
+        public virtual Category Category { get; set; }
     }
 
 }

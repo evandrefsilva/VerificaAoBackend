@@ -18,7 +18,7 @@ namespace Services.Models.DTO
             UnLike = news.UnLike;
             ReadTime = news.ReadTime;
             PublishedBy = $"{news.PublishedBy?.FirstName} {news.PublishedBy?.LastName}";
-            TagName = news.Tag?.Name;
+            TagName = news.Category?.Name;
         }
 
         public int Id { get; set; }

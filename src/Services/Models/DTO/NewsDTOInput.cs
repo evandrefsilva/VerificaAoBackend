@@ -23,7 +23,7 @@ namespace Services.Models.DTO
         public DateTime PublishedDate { get; set; }
 
         [Required(ErrorMessage = "The tag id is required.")]
-        public int TagId { get; set; }
+        public int CategoryId { get; set; }
 
         public int ReadTime { get; set; }
         public int? VerficationId { get; set; } = 0;

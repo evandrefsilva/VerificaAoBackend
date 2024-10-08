@@ -87,7 +87,7 @@ namespace Application
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<IComunicationService, ComunicationService>();
             services.AddTransient<IAppSettingsService, AppSettingsService>();
-            services.AddTransient<ITagService, TagService>();
+            services.AddTransient<ICategoryService, CategoryService>();
             services.AddTransient<INewsService, NewsService>();
             services.AddScoped<FileUploadService, FileUploadService>();
 
