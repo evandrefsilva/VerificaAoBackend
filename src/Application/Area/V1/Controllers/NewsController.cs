@@ -95,7 +95,6 @@ namespace Application.Areas.V1.Controllers
             return BadRequest(result);
         }
 
-        // 7. Listar notícias por tag
         [HttpGet("tag/{tag}")]
         [AllowAnonymous]
         public async Task<IActionResult> GetNewsByTag(string tag, int page = 1, int take = 30)
@@ -106,7 +105,6 @@ namespace Application.Areas.V1.Controllers
             return BadRequest(result);
         }
 
-        // 7. Listar notícias por tag
         [HttpGet("tag/{id}")]
         [AllowAnonymous]
         public async Task<IActionResult> GetNewsById(int id, int page = 1, int take = 30, CancellationToken cancellationToken = default)
@@ -131,6 +129,15 @@ namespace Application.Areas.V1.Controllers
         public async Task<IActionResult> Unlike([FromBody] UnlikeDTO dto, CancellationToken cancellationToken)
         {
             var result = await _newsService.Unlike(dto, cancellationToken);
+            if (!result.Success)
+                return BadRequest(result);
+
+            return Ok(result);
+        }
+        [HttpPatch("toogle-publish/{id}")]
+        public async Task<IActionResult> TooglePusblish(int Id, CancellationToken cancellationToken)
+        {
+            var result = await _newsService.TooglePusblish(Id, cancellationToken);
             if (!result.Success)
                 return BadRequest(result);
 

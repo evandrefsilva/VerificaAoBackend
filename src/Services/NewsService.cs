@@ -9,6 +9,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Data.NewsVerfication;
+using DocumentFormat.OpenXml.Office2010.Excel;
 
 namespace Services
 {
@@ -20,7 +21,7 @@ namespace Services
         Task<AppResult> Delete(int id, CancellationToken cancellationToken = default);
         //Task<AppResult> Approve(int id, CancellationToken cancellationToken = default);
         //Task<AppResult> Reject(int id, CancellationToken cancellationToken = default);
-       // Task<AppResult> ForceReview(int id, CancellationToken cancellationToken = default);
+        // Task<AppResult> ForceReview(int id, CancellationToken cancellationToken = default);
         Task<AppResult> GetAll(int page = 1, int take = 30, string filter = null, CancellationToken cancellationToken = default);
         Task<AppResult> GetAllPublished(int page = 1, int take = 30, string filter = null, CancellationToken cancellationToken = default);
         Task<AppResult> GetPopularNews(int page = 1, int take = 30, CancellationToken cancellationToken = default);
@@ -34,6 +35,7 @@ namespace Services
 
         Task<AppResult> Unlike(UnlikeDTO dto, CancellationToken cancellationToken = default);
         Task<AppResult> Like(LikeDTO dto, CancellationToken cancellationToken = default);
+        Task<AppResult> TooglePusblish(int NewsId, CancellationToken cancellationToken = default);
     }
 
     public class NewsService : INewsService
@@ -62,7 +64,8 @@ namespace Services
                     CategoryId = dto.CategoryId,
                     CoverUrl = dto.CoverUrl,
                     PublishedById = publishedId,
-                    VerificationId = dto.VerficationId                };
+                    VerificationId = dto.VerficationId
+                };
                 // Salva a notícia no banco
                 await _db.News.AddAsync(news, cancellationToken);
                 await _db.SaveChangesAsync(cancellationToken);
@@ -152,7 +155,7 @@ namespace Services
                 news.Title = dto.Title;
                 news.Resume = dto.Resume;
                 news.Text = dto.Text;
-               // news.PublicationDate = DateTime.UtcNow;
+                // news.PublicationDate = DateTime.UtcNow;
                 news.CoverUrl = dto.CoverUrl;
 
                 _db.News.Update(news);
@@ -199,29 +202,6 @@ namespace Services
         //    return await ChangeStatus(id, false, cancellationToken);
         //}
 
-        private async Task<AppResult> ChangeStatus(int id, bool isPublished, CancellationToken cancellationToken)
-        {
-            var result = new AppResult();
-            try
-            {
-                var news = await _db.News.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
-                if (news == null)
-                    return result.Bad("News not found");
-
-                news.IsPublished = isPublished;
-                news.PublicationDate = DateTime.UtcNow;
-
-                _db.News.Update(news);
-                await _db.SaveChangesAsync(cancellationToken);
-
-                return result.Good();
-            }
-            catch (Exception e)
-            {
-                return result.Bad(e.Message);
-            }
-        }
-
         public async Task<AppResult> GetAll(int page = 1, int take = 30, string filter = null, CancellationToken cancellationToken = default)
         {
             var result = new AppResult();
@@ -253,7 +233,6 @@ namespace Services
                 return result.Bad(e.Message);
             }
         }
-
         public async Task<AppResult> GetAllPublished(int page = 1, int take = 30, string filter = null, CancellationToken cancellation = default)
         {
             var result = new AppResult();
@@ -341,7 +320,7 @@ namespace Services
                 verification.VerificationStatusId = changeStatusDTO.VerficationStatusId;
                 verification.VerificationDate = DateTime.UtcNow;
 
-                
+
                 _db.Verifications.Update(verification);
                 await _db.SaveChangesAsync(cancellationToken);
 
@@ -431,6 +410,30 @@ namespace Services
                     .ToListAsync(cancellationToken);
 
                 return result.Good(newsList);
+            }
+            catch (Exception e)
+            {
+                return result.Bad(e.Message);
+            }
+        }
+
+        public async Task<AppResult> TooglePusblish(int id, CancellationToken cancellationToken = default)
+        {
+
+            var result = new AppResult();
+            try
+            {
+                var news = await _db.News.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+                if (news == null)
+                    return result.Bad("News not found");
+
+
+                news.IsPublished = !news.IsPublished;
+
+                _db.News.Update(news);
+                await _db.SaveChangesAsync(cancellationToken);
+
+                return result.Good(news.Id);
             }
             catch (Exception e)
             {
