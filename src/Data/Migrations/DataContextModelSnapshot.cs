@@ -19,6 +19,24 @@ namespace Data.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("ProductVersion", "5.0.10");
 
+            modelBuilder.Entity("Data.AuthEntities.Permission", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .UseIdentityColumn();
+
+                    b.Property<string>("Module")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Permissions");
+                });
+
             modelBuilder.Entity("Data.AuthEntities.Role", b =>
                 {
                     b.Property<int>("Id")
@@ -27,7 +45,6 @@ namespace Data.Migrations
                         .UseIdentityColumn();
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Slug")
@@ -35,7 +52,7 @@ namespace Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Role");
+                    b.ToTable("Roles");
 
                     b.HasData(
                         new
@@ -63,6 +80,21 @@ namespace Data.Migrations
                             Id = 5,
                             Name = "User"
                         });
+                });
+
+            modelBuilder.Entity("Data.AuthEntities.RolePermission", b =>
+                {
+                    b.Property<int>("RoleId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PermissionId")
+                        .HasColumnType("int");
+
+                    b.HasKey("RoleId", "PermissionId");
+
+                    b.HasIndex("PermissionId");
+
+                    b.ToTable("RolePermissions");
                 });
 
             modelBuilder.Entity("Data.AuthEntities.User", b =>
@@ -123,7 +155,7 @@ namespace Data.Migrations
                         new
                         {
                             Id = new Guid("11111111-1111-1111-1111-111111111111"),
-                            CreatedAt = new DateTime(2024, 10, 8, 14, 41, 51, 650, DateTimeKind.Utc).AddTicks(9162),
+                            CreatedAt = new DateTime(2024, 10, 9, 14, 15, 49, 139, DateTimeKind.Utc).AddTicks(6878),
                             Email = "admin@admin.com",
                             FirstName = "Administrador de Sistema",
                             IsActive = true,
@@ -385,6 +417,25 @@ namespace Data.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Data.AuthEntities.RolePermission", b =>
+                {
+                    b.HasOne("Data.AuthEntities.Permission", "Permission")
+                        .WithMany("RolePermissions")
+                        .HasForeignKey("PermissionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Data.AuthEntities.Role", "Role")
+                        .WithMany("RolePermissions")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Permission");
+
+                    b.Navigation("Role");
+                });
+
             modelBuilder.Entity("Data.AuthEntities.User", b =>
                 {
                     b.HasOne("Data.AuthEntities.Role", "Role")
@@ -463,6 +514,16 @@ namespace Data.Migrations
                     b.Navigation("VerificationStatus");
 
                     b.Navigation("VerifiedBy");
+                });
+
+            modelBuilder.Entity("Data.AuthEntities.Permission", b =>
+                {
+                    b.Navigation("RolePermissions");
+                });
+
+            modelBuilder.Entity("Data.AuthEntities.Role", b =>
+                {
+                    b.Navigation("RolePermissions");
                 });
 
             modelBuilder.Entity("Data.NewsVerfication.Category", b =>

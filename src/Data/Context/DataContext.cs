@@ -31,8 +31,27 @@ namespace Data.Context
             new UserConfiguration(modelBuilder.Entity<User>());
             new VerificationStatusConfiguration(modelBuilder.Entity<VerificationStatus>());
             new RoleConfiguration(modelBuilder.Entity<Role>());
+
+            // Configuração da chave primária composta para RolePermission
+            modelBuilder.Entity<RolePermission>()
+                .HasKey(rp => new { rp.RoleId, rp.PermissionId });
+
+            // Configuração dos relacionamentos
+            modelBuilder.Entity<RolePermission>()
+                .HasOne(rp => rp.Role)
+                .WithMany(r => r.RolePermissions)
+                .HasForeignKey(rp => rp.RoleId);
+
+            modelBuilder.Entity<RolePermission>()
+                .HasOne(rp => rp.Permission)
+                .WithMany(p => p.RolePermissions)
+                .HasForeignKey(rp => rp.PermissionId);
+
         }
         public DbSet<User> Users { get; set; }
+        public DbSet<Role> Roles { get; set; }
+        public DbSet<Permission> Permissions { get; set; }
+        public DbSet<RolePermission> RolePermissions { get; set; }
         public DbSet<AppSettings> AppConfigurations { get; set; }
         public DbSet<News> News { get; set; }
         public DbSet<Category> Categories { get; set; }

@@ -38,17 +38,31 @@ namespace Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Role",
+                name: "Permissions",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Module = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Permissions", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Roles",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Slug = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Role", x => x.Id);
+                    table.PrimaryKey("PK_Roles", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -62,6 +76,30 @@ namespace Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_VerificationStatus", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RolePermissions",
+                columns: table => new
+                {
+                    RoleId = table.Column<int>(type: "int", nullable: false),
+                    PermissionId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RolePermissions", x => new { x.RoleId, x.PermissionId });
+                    table.ForeignKey(
+                        name: "FK_RolePermissions_Permissions_PermissionId",
+                        column: x => x.PermissionId,
+                        principalTable: "Permissions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_RolePermissions_Roles_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "Roles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -88,9 +126,9 @@ namespace Data.Migrations
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Users_Role_RoleId",
+                        name: "FK_Users_Roles_RoleId",
                         column: x => x.RoleId,
-                        principalTable: "Role",
+                        principalTable: "Roles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -218,7 +256,7 @@ namespace Data.Migrations
                 values: new object[] { "WesenderAppKey", "Acesso Wesender", "" });
 
             migrationBuilder.InsertData(
-                table: "Role",
+                table: "Roles",
                 columns: new[] { "Id", "Name", "Slug" },
                 values: new object[,]
                 {
@@ -243,7 +281,7 @@ namespace Data.Migrations
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "Id", "CreatedAt", "Email", "FirstName", "IsActive", "IsDeleted", "IsEmailVerified", "LastName", "Password", "ProfilePicture", "RoleId", "UpdatedAt", "Username", "VerifyCode", "VerifyCodeDate" },
-                values: new object[] { new Guid("11111111-1111-1111-1111-111111111111"), new DateTime(2024, 10, 8, 14, 41, 51, 650, DateTimeKind.Utc).AddTicks(9162), "admin@admin.com", "Administrador de Sistema", true, false, false, "Administrador de Sistema", "0f3d85258d593088098f65c26e89d49bf1bcf29b2b57dcfc36865ecefec7551fb8f232a028d98bd39acfb2710ef5e6e8f08e5a4ddbc213a82ad6008e64861abd", null, 1, null, "admin", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) });
+                values: new object[] { new Guid("11111111-1111-1111-1111-111111111111"), new DateTime(2024, 10, 9, 14, 15, 49, 139, DateTimeKind.Utc).AddTicks(6878), "admin@admin.com", "Administrador de Sistema", true, false, false, "Administrador de Sistema", "0f3d85258d593088098f65c26e89d49bf1bcf29b2b57dcfc36865ecefec7551fb8f232a028d98bd39acfb2710ef5e6e8f08e5a4ddbc213a82ad6008e64861abd", null, 1, null, "admin", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) });
 
             migrationBuilder.CreateIndex(
                 name: "IX_News_CategoryId",
@@ -260,6 +298,11 @@ namespace Data.Migrations
                 table: "News",
                 column: "VerificationId",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RolePermissions_PermissionId",
+                table: "RolePermissions",
+                column: "PermissionId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserCategories_CategoryId",
@@ -301,10 +344,16 @@ namespace Data.Migrations
                 name: "News");
 
             migrationBuilder.DropTable(
+                name: "RolePermissions");
+
+            migrationBuilder.DropTable(
                 name: "UserCategories");
 
             migrationBuilder.DropTable(
                 name: "Verifications");
+
+            migrationBuilder.DropTable(
+                name: "Permissions");
 
             migrationBuilder.DropTable(
                 name: "Categories");
@@ -316,7 +365,7 @@ namespace Data.Migrations
                 name: "VerificationStatus");
 
             migrationBuilder.DropTable(
-                name: "Role");
+                name: "Roles");
         }
     }
 }

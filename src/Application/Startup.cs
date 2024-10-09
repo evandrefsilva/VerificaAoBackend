@@ -22,6 +22,8 @@ using Hangfire.Storage.SQLite;
 using Application.Filters;
 using Hangfire.Dashboard;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
+using Services.Helpers;
 
 namespace Application
 {
@@ -39,6 +41,7 @@ namespace Application
             services.AddDbContext<DataContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("Conn"))
             );
+           
             services.AddControllersWithViews();
             services.AddSwaggerGen(c =>
             {
@@ -57,18 +60,18 @@ namespace Application
             });
 
             services.AddAuthentication(x =>
-        {
-            x.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            {
+                x.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
 
-        })
-           .AddCookie(config =>
-           {
-               //config.Cookie.IsEssential = true;
-               config.Cookie.Name = $"verifica.Cookie";
-               config.LoginPath = "/account/login";
-               config.AccessDeniedPath = "/_401";
+            })
+            .AddCookie(config =>
+            {
+                //config.Cookie.IsEssential = true;
+                config.Cookie.Name = $"verifica.Cookie";
+                config.LoginPath = "/account/login";
+                config.AccessDeniedPath = "/_401";
 
-           });
+            });
             services.AddCors(options =>
             {
                 options.AddPolicy("CorsPolicy",
@@ -100,6 +103,19 @@ namespace Application
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+
+            var services = app.ApplicationServices;
+            try
+            {
+                PermissionSeeder.SeedPermissionsAsync(services).Wait();
+            }
+            catch (Exception ex)
+            {
+                // Log da exceção
+                var logger = services.GetRequiredService<ILogger<Program>>();
+                logger.LogError(ex, "Ocorreu um erro durante o seeding das permissões.");
+            }
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

@@ -29,7 +29,7 @@ namespace Application.Areas.V1.Controllers
         // 4. Verificar uma notícia
         [HttpPost("request")]
         //[Authorize]
-        public async Task<IActionResult> VerifyNews([FromForm] VerificationDTOInput verificationDTO, CancellationToken cancellationToken)
+        public async Task<IActionResult> RequestVerification([FromForm] VerificationDTOInput verificationDTO, CancellationToken cancellationToken)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

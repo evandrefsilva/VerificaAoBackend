@@ -4,11 +4,13 @@ using System.Text;
 
 namespace Data.AuthEntities
 {
-    public class Role
+    public class Permission
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public string Slug { get; set; }
+        public string Module { get; set; } 
+
+        // Relação com RolePermission
         public ICollection<RolePermission> RolePermissions { get; set; }
     }
 }
