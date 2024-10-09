@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using Data.AuthEntities;
 using DocumentFormat.OpenXml.Spreadsheet;
 using System.Collections.Generic;
+using Services.Enums;
 
 namespace Services
 {
@@ -88,6 +89,7 @@ namespace Services
                 Username = dto.Email,
                 Email = dto.Email,
                 Password = dto.Password.ToSha512Hash(),
+                RoleId = (int) RoleEnum.User
             };
 
             await _db.Users.AddAsync(user);
