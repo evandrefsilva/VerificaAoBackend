@@ -56,6 +56,8 @@ namespace Services
         {
             var res = new AppResult();
             var user = _db.Users
+                .Include(u => u.Role.RolePermissions)
+                .ThenInclude(rp => rp.Permission)
                 .FirstOrDefault(x => x.Username == dto.Email
                    && x.Password == dto.Password.ToSha512Hash());
 
@@ -69,7 +71,9 @@ namespace Services
                 Name = user.FirstName,
                 UserId = user.Id,
                 Email = user.Email,
-                Token = token
+                Role = user.Role.Name,
+                Token = token,
+                Permissions = user.Role.RolePermissions.Select(rp => new PermissionDTO(rp.Permission)).ToList()
             });
         }
 
@@ -89,7 +93,7 @@ namespace Services
                 Username = dto.Email,
                 Email = dto.Email,
                 Password = dto.Password.ToSha512Hash(),
-                RoleId = (int) RoleEnum.User
+                RoleId = (int)RoleEnum.User
             };
 
             await _db.Users.AddAsync(user);
@@ -193,26 +197,32 @@ namespace Services
         }
         private string GenerateJwtToken(User user)
         {
-            var claims = new[]
+            var permissions = user.Role.RolePermissions.Select(rp => rp.Permission.Name).ToList();
+
+            var claims = new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Username),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
+            // Adiciona as permissões como claims
+            foreach (var permission in permissions)
+            {
+                claims.Add(new Claim("Permission", permission));
+            }
+
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSecret));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
-                issuer: null,
-                audience: null,
+                issuer: "verificapp",
+                audience: "verificapp",
                 claims: claims,
                 expires: DateTime.Now.AddMinutes(30),
                 signingCredentials: creds);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
-
-
         // Métodos para listar utilizadores
         public async Task<AppResult> ListUsers(int page = 1, int take = 30)
         {
