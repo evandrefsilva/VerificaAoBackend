@@ -26,7 +26,7 @@ namespace Services.Models.DTO
         public int CategoryId { get; set; }
 
         public int ReadTime { get; set; }
-        public int? VerficationId { get; set; } = 0;
+        public int VerficationId { get; set; }
     }
 
     public class VerificationDTOInput
@@ -38,8 +38,6 @@ namespace Services.Models.DTO
         public string PublishedTitle { get; set; }
         public string PublishedChannel { get; set; }
         public List<IFormFile> Attachment { get; set; }
+        public Guid? VerifiedById { get; set; }
     }
-
-
-
 }

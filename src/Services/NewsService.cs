@@ -18,15 +18,15 @@ namespace Services
         Task<AppResult> CreateVerification(VerificationDTOInput news, Guid requestedById, CancellationToken cancellationToken = default);
         Task<AppResult> Edit(int id, NewsDTOInput news, CancellationToken cancellationToken = default);
         Task<AppResult> Delete(int id, CancellationToken cancellationToken = default);
-        Task<AppResult> Approve(int id, CancellationToken cancellationToken = default);
-        Task<AppResult> Reject(int id, CancellationToken cancellationToken = default);
-        Task<AppResult> ForceReview(int id, CancellationToken cancellationToken = default);
+        //Task<AppResult> Approve(int id, CancellationToken cancellationToken = default);
+        //Task<AppResult> Reject(int id, CancellationToken cancellationToken = default);
+       // Task<AppResult> ForceReview(int id, CancellationToken cancellationToken = default);
         Task<AppResult> GetAll(int page = 1, int take = 30, string filter = null, CancellationToken cancellationToken = default);
         Task<AppResult> GetAllPublished(int page = 1, int take = 30, string filter = null, CancellationToken cancellationToken = default);
         Task<AppResult> GetPopularNews(int page = 1, int take = 30, CancellationToken cancellationToken = default);
         //Task<AppResult> VerifyNews(int newsId, VerificationDTOInput verificationDTO, CancellationToken cancellationToken = default);
         Task<AppResult> GetAllVerfications(int page = 1, int take = 30, CancellationToken cancellationToken = default);
-        Task<AppResult> ChangeVerificationStatus(int newsId, int verificationStatusId, CancellationToken cancellationToken = default);
+        Task<AppResult> ChangeVerificationStatus(ChangeVerificationStatusDTO changeStatusDTO, CancellationToken cancellationToken = default);
 
         Task<AppResult> GetNewsByTag(string tag, int page = 1, int take = 30, CancellationToken cancellationToken = default);
         Task<AppResult> GetNewsDetails(int id, CancellationToken cancellationToken = default);
@@ -61,9 +61,8 @@ namespace Services
                     ReadTime = dto.ReadTime,
                     CategoryId = dto.CategoryId,
                     CoverUrl = dto.CoverUrl,
-                    PublishedById = publishedId
-                };
-
+                    PublishedById = publishedId,
+                    VerificationId = dto.VerficationId                };
                 // Salva a notícia no banco
                 await _db.News.AddAsync(news, cancellationToken);
                 await _db.SaveChangesAsync(cancellationToken);
@@ -153,7 +152,7 @@ namespace Services
                 news.Title = dto.Title;
                 news.Resume = dto.Resume;
                 news.Text = dto.Text;
-                news.PublicationDate = DateTime.UtcNow;
+               // news.PublicationDate = DateTime.UtcNow;
                 news.CoverUrl = dto.CoverUrl;
 
                 _db.News.Update(news);
@@ -190,20 +189,15 @@ namespace Services
             }
         }
 
-        public async Task<AppResult> Approve(int id, CancellationToken cancellationToken)
-        {
-            return await ChangeStatus(id, true, cancellationToken);
-        }
+        //public async Task<AppResult> Approve(int id, CancellationToken cancellationToken)
+        //{
+        //    return await ChangeStatus(id, true, cancellationToken);
+        //}
 
-        public async Task<AppResult> Reject(int id, CancellationToken cancellationToken)
-        {
-            return await ChangeStatus(id, false, cancellationToken);
-        }
-
-        public async Task<AppResult> ForceReview(int id, CancellationToken cancellationToken)
-        {
-            return await ChangeVerificationStatus(id, 3, cancellationToken); // "Em Revisão"
-        }
+        //public async Task<AppResult> Reject(int id, CancellationToken cancellationToken)
+        //{
+        //    return await ChangeStatus(id, false, cancellationToken);
+        //}
 
         private async Task<AppResult> ChangeStatus(int id, bool isPublished, CancellationToken cancellationToken)
         {
@@ -333,25 +327,25 @@ namespace Services
             }
         }
 
-        public async Task<AppResult> ChangeVerificationStatus(int newsId, int verificationStatusId, CancellationToken cancellationToken = default)
+        public async Task<AppResult> ChangeVerificationStatus(ChangeVerificationStatusDTO changeStatusDTO, CancellationToken cancellationToken = default)
         {
             var result = new AppResult();
             try
             {
-                var news = await _db.News
-                    .Include(n => n.Verification)
-                    .FirstOrDefaultAsync(x => x.Id == newsId, cancellationToken);
+                var verification = await _db.Verifications
+                    .FirstOrDefaultAsync(x => x.Id == changeStatusDTO.VerificationId, cancellationToken);
 
-                if (news == null || news.Verification == null)
-                    return result.Bad("News or verification not found");
+                if (verification == null)
+                    return result.Bad("Verificação inexistente.");
 
-                news.Verification.VerificationStatusId = verificationStatusId;
-                news.Verification.VerificationDate = DateTime.UtcNow;
+                verification.VerificationStatusId = changeStatusDTO.VerficationStatusId;
+                verification.VerificationDate = DateTime.UtcNow;
 
-                _db.Verifications.Update(news.Verification);
+                
+                _db.Verifications.Update(verification);
                 await _db.SaveChangesAsync(cancellationToken);
 
-                return result.Good(news.Verification.Id);
+                return result.Good("Estado alterado com sucesso");
             }
             catch (Exception e)
             {

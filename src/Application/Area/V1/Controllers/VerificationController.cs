@@ -40,6 +40,18 @@ namespace Application.Areas.V1.Controllers
             return BadRequest(result);
         }
 
+        [HttpPatch("status")]
+        //[Authorize]
+        public async Task<IActionResult> ChangeVerificationStatus
+            ([FromForm] ChangeVerificationStatusDTO dto, CancellationToken cancellationToken)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
+            var result = await _newsService.ChangeVerificationStatus(dto, cancellationToken);
+            if (result.Success)
+                return Ok(result);
+            return BadRequest(result);
+        }
     }
 }
