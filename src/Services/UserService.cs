@@ -49,7 +49,7 @@ namespace Services
         public UserService(DataContext db)
         {
             _db = db;
-            _jwtSecret = "secret";
+            _jwtSecret = "mysupersecretdeve";
         }
 
         public AppResult Login(LoginDTO dto)
@@ -308,13 +308,18 @@ namespace Services
             var roles = await _db.Roles
                 .Include(r => r.RolePermissions)
                 .ThenInclude(rp => rp.Permission)
-                .Select(x=> new
+                .Select(x => new
                 {
                     x.Id,
                     x.Name,
                     x.Slug,
-                    Permissions = x.RolePermissions.Select(y => new { y.Permission.Id, y.Permission.Name})
-                    
+                    Permissions = x.RolePermissions.Select(y => new
+                    {
+                        y.Permission.Id,
+                        y.Permission.Name,
+                        y.Permission.Module
+                    })
+
                 })
                 .ToListAsync();
             return new AppResult().Good("Listagem de perfis.", roles);
