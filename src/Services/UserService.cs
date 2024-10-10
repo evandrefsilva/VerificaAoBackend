@@ -308,6 +308,14 @@ namespace Services
             var roles = await _db.Roles
                 .Include(r => r.RolePermissions)
                 .ThenInclude(rp => rp.Permission)
+                .Select(x=> new
+                {
+                    x.Id,
+                    x.Name,
+                    x.Slug,
+                    Permissions = x.RolePermissions.Select(y => new { y.Permission.Id, y.Permission.Name})
+                    
+                })
                 .ToListAsync();
             return new AppResult().Good("Listagem de perfis.", roles);
         }
