@@ -9,7 +9,7 @@ namespace Services.Enums
         Admin = 1,
         Manager,
         Publisher,
-        Reviewer,
+        Verifier,
         User
     }
 }

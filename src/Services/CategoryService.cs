@@ -19,6 +19,7 @@ namespace Services
         Task<AppResult> GetActiveCategorys();
         Task<AppResult> GetCategoryById(int Id);
         Task<AppResult> AssociateUserWithCategory(AssociateUserCategoryDTO dto);
+        Task<AppResult> DeassociateUserWithCategory(AssociateUserCategoryDTO dto);
     }
     public class CategoryService : ICategoryService
     {
