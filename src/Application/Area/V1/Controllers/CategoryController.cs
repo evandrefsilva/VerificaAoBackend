@@ -55,11 +55,11 @@ namespace Application.Area.V1.Controllers
 
         // Adicionar tag a um item
         [HttpPost("{categoryId}/user{userId}")]
-        public async Task<IActionResult> AssociateUserWithCategory([FromRoute] int id, [FromRoute] Guid userId)
+        public async Task<IActionResult> AssociateUserWithCategory([FromRoute] int categoryId, [FromRoute] Guid userId)
         {
             var result = await _categoryService.AssociateUserWithCategory(new AssociateUserCategoryDTO
             {
-                CategoryId = id,
+                CategoryId = categoryId,
                 UserId = userId
             });
             if (!result.Success)
@@ -69,11 +69,11 @@ namespace Application.Area.V1.Controllers
         }
         // Adicionar tag a um item
         [HttpDelete("{categoryId}/user{userId}")]
-        public async Task<IActionResult> DeassociateUserWithCategory([FromRoute] int id, [FromRoute] Guid userId)
+        public async Task<IActionResult> DeassociateUserWithCategory([FromRoute] int categoryId, [FromRoute] Guid userId)
         {
             var result = await _categoryService.DeassociateUserWithCategory(new AssociateUserCategoryDTO
             {
-                CategoryId = id,
+                CategoryId = categoryId,
                 UserId = userId
             });
             if (!result.Success)
