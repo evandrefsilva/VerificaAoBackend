@@ -9,7 +9,7 @@ namespace Data.NewsVerfication
     public class UserCategory
     {
         [Key]
-        public int UserId { get; set; }
+        public Guid UserId { get; set; }
         [Key]
         public User User { get; set; }
 

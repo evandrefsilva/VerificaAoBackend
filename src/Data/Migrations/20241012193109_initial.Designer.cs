@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20241009141549_initialDb")]
-    partial class initialDb
+    [Migration("20241012193109_initial")]
+    partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -157,7 +157,7 @@ namespace Data.Migrations
                         new
                         {
                             Id = new Guid("11111111-1111-1111-1111-111111111111"),
-                            CreatedAt = new DateTime(2024, 10, 9, 14, 15, 49, 139, DateTimeKind.Utc).AddTicks(6878),
+                            CreatedAt = new DateTime(2024, 10, 12, 19, 31, 8, 778, DateTimeKind.Utc).AddTicks(9619),
                             Email = "admin@admin.com",
                             FirstName = "Administrador de Sistema",
                             IsActive = true,
@@ -298,15 +298,14 @@ namespace Data.Migrations
 
             modelBuilder.Entity("Data.NewsVerfication.UserCategory", b =>
                 {
-                    b.Property<int>("UserId")
+                    b.Property<Guid>("UserId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
-                    b.Property<Guid?>("UserId1")
+                    b.Property<Guid>("UserId1")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("UserId");
@@ -486,7 +485,9 @@ namespace Data.Migrations
 
                     b.HasOne("Data.AuthEntities.User", "User")
                         .WithMany()
-                        .HasForeignKey("UserId1");
+                        .HasForeignKey("UserId1")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("Category");
 

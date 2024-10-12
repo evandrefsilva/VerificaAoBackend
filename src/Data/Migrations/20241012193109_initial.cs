@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Data.Migrations
 {
-    public partial class initialDb : Migration
+    public partial class initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -137,9 +137,8 @@ namespace Data.Migrations
                 name: "UserCategories",
                 columns: table => new
                 {
-                    UserId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CategoryId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -281,7 +280,7 @@ namespace Data.Migrations
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "Id", "CreatedAt", "Email", "FirstName", "IsActive", "IsDeleted", "IsEmailVerified", "LastName", "Password", "ProfilePicture", "RoleId", "UpdatedAt", "Username", "VerifyCode", "VerifyCodeDate" },
-                values: new object[] { new Guid("11111111-1111-1111-1111-111111111111"), new DateTime(2024, 10, 9, 14, 15, 49, 139, DateTimeKind.Utc).AddTicks(6878), "admin@admin.com", "Administrador de Sistema", true, false, false, "Administrador de Sistema", "0f3d85258d593088098f65c26e89d49bf1bcf29b2b57dcfc36865ecefec7551fb8f232a028d98bd39acfb2710ef5e6e8f08e5a4ddbc213a82ad6008e64861abd", null, 1, null, "admin", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) });
+                values: new object[] { new Guid("11111111-1111-1111-1111-111111111111"), new DateTime(2024, 10, 12, 19, 31, 8, 778, DateTimeKind.Utc).AddTicks(9619), "admin@admin.com", "Administrador de Sistema", true, false, false, "Administrador de Sistema", "0f3d85258d593088098f65c26e89d49bf1bcf29b2b57dcfc36865ecefec7551fb8f232a028d98bd39acfb2710ef5e6e8f08e5a4ddbc213a82ad6008e64861abd", null, 1, null, "admin", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) });
 
             migrationBuilder.CreateIndex(
                 name: "IX_News_CategoryId",
