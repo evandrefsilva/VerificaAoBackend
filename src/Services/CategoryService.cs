@@ -161,8 +161,8 @@ namespace Services
         {
             var res = new AppResult();
 
-            var user = await _db.Users.FindAsync(dto.UserId);
-            var category = await _db.Categories.FindAsync(dto.CategoryId);
+            var user = await _db.Users.FirstOrDefaultAsync(x => x.Id == dto.UserId);
+            var category = await _db.Categories.FirstOrDefaultAsync(x => x.Id == dto.CategoryId);
 
             if (user == null || category == null)
             {

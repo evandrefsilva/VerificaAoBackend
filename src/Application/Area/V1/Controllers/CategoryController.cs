@@ -54,7 +54,7 @@ namespace Application.Area.V1.Controllers
         }
 
         // Adicionar tag a um item
-        [HttpPost("{categoryId}/user{userId}")]
+        [HttpPost("{categoryId}/user/{userId}")]
         public async Task<IActionResult> AssociateUserWithCategory([FromRoute] int categoryId, [FromRoute] Guid userId)
         {
             var result = await _categoryService.AssociateUserWithCategory(new AssociateUserCategoryDTO
@@ -63,12 +63,12 @@ namespace Application.Area.V1.Controllers
                 UserId = userId
             });
             if (!result.Success)
-                return BadRequest(result.Message);
+                return BadRequest(result);
 
-            return Ok(result.Message);
+            return Ok(result);
         }
         // Adicionar tag a um item
-        [HttpDelete("{categoryId}/user{userId}")]
+        [HttpDelete("{categoryId}/user/{userId}")]
         public async Task<IActionResult> DeassociateUserWithCategory([FromRoute] int categoryId, [FromRoute] Guid userId)
         {
             var result = await _categoryService.DeassociateUserWithCategory(new AssociateUserCategoryDTO
@@ -77,9 +77,9 @@ namespace Application.Area.V1.Controllers
                 UserId = userId
             });
             if (!result.Success)
-                return BadRequest(result.Message);
+                return BadRequest(result);
 
-            return Ok(result.Message);
+            return Ok(result);
         }
         // Listar todas as tags
         [HttpGet]
