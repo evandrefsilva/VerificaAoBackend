@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services;
 using Services.Models.DTO;
+using System;
 using System.Threading.Tasks;
 
 namespace Application.Area.V1.Controllers
@@ -54,9 +55,13 @@ namespace Application.Area.V1.Controllers
 
         // Adicionar tag a um item
         [HttpPost("{categoryId}/user{userId}")]
-        public async Task<IActionResult> AssociateUserWithCategory([FromRoute] AssociateUserCategoryDTO dto)
+        public async Task<IActionResult> AssociateUserWithCategory([FromRoute] int id, [FromRoute] Guid userId)
         {
-            var result = await _categoryService.AssociateUserWithCategory(dto);
+            var result = await _categoryService.AssociateUserWithCategory(new AssociateUserCategoryDTO
+            {
+                CategoryId = id,
+                UserId = userId
+            });
             if (!result.Success)
                 return BadRequest(result.Message);
 
@@ -64,9 +69,13 @@ namespace Application.Area.V1.Controllers
         }
         // Adicionar tag a um item
         [HttpDelete("{categoryId}/user{userId}")]
-        public async Task<IActionResult> DeassociateUserWithCategory([FromRoute] AssociateUserCategoryDTO dto)
+        public async Task<IActionResult> DeassociateUserWithCategory([FromRoute] int id, [FromRoute] Guid userId)
         {
-            var result = await _categoryService.DeassociateUserWithCategory(dto);
+            var result = await _categoryService.DeassociateUserWithCategory(new AssociateUserCategoryDTO
+            {
+                CategoryId = id,
+                UserId = userId
+            });
             if (!result.Success)
                 return BadRequest(result.Message);
 
