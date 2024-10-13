@@ -10,6 +10,8 @@ namespace Data.NewsVerfication
     {
         public int VerificationStatusId { get; set; }
         public VerificationStatus VerificationStatus { get; set; }
+        public int? VerificationClassificationId { get; set; }
+        public VerificationClassification VerificationClassification { get; set; }
         public Guid? VerifiedById { get; set; }
         public User VerifiedBy { get; set; }
 

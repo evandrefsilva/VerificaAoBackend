@@ -15,14 +15,14 @@ namespace Services
 {
     public interface INewsService
     {
-        Task<AppResult> Create(NewsDTOInput news, Guid publishedId, CancellationToken cancellationToken = default);
+        Task<AppResult> CreateNews(NewsDTOInput news, Guid publishedId, CancellationToken cancellationToken = default);
         Task<AppResult> CreateVerification(VerificationDTOInput news, Guid requestedById, CancellationToken cancellationToken = default);
         Task<AppResult> Edit(int id, NewsDTOInput news, CancellationToken cancellationToken = default);
         Task<AppResult> Delete(int id, CancellationToken cancellationToken = default);
         //Task<AppResult> Approve(int id, CancellationToken cancellationToken = default);
         //Task<AppResult> Reject(int id, CancellationToken cancellationToken = default);
         // Task<AppResult> ForceReview(int id, CancellationToken cancellationToken = default);
-        Task<AppResult> GetAll(int page = 1, int take = 30, string filter = null, CancellationToken cancellationToken = default);
+        Task<AppResult> GetAllNews(int page = 1, int take = 30, string filter = null, CancellationToken cancellationToken = default);
         Task<AppResult> GetAllPublished(int page = 1, int take = 30, string filter = null, CancellationToken cancellationToken = default);
         Task<AppResult> GetPopularNews(int page = 1, int take = 30, CancellationToken cancellationToken = default);
         //Task<AppResult> VerifyNews(int newsId, VerificationDTOInput verificationDTO, CancellationToken cancellationToken = default);
@@ -46,11 +46,18 @@ namespace Services
         {
             _db = db;
         }
-        public async Task<AppResult> Create(NewsDTOInput dto, Guid publishedId, CancellationToken cancellationToken)
+        public async Task<AppResult> CreateNews(NewsDTOInput dto, Guid publishedId, CancellationToken cancellationToken)
         {
             var result = new AppResult();
+
+            var verification = await _db.Verifications.FindAsync(dto.VerficationId, cancellationToken);
+            if (verification == null)
+                return result.Bad("Verificacao invalida");
             try
             {
+                verification.VerificationClassificationId = dto.VerificationClassificationId;
+                verification.VerificationStatusId = dto.VerificationStatusId;
+                verification.Obs = dto.Obs;
                 var news = new News
                 {
                     Title = dto.Title,
@@ -85,6 +92,7 @@ namespace Services
                 var verifications = await _db.Verifications
                     .Include(v => v.News)
                     .Include(v => v.VerificationStatus)
+                    .Include(v => v.VerificationClassification)
                     .Include(v => v.RequestedBy)
                     .Include(v => v.VerifiedBy)
                     .Skip((page - 1) * take)
@@ -94,6 +102,7 @@ namespace Services
                         Id = v.Id,
                         VerificationStatusId = v.VerificationStatusId,
                         VerificationStatus = v.VerificationStatus.Name,
+                        VerificationClassification = v.VerificationClassification.Name,
                         RequestedBy = v.RequestedBy.GetFullName(),
                         RequestedDate = v.CreatedAt,
                         MainLink = v.MainLink,
@@ -191,18 +200,7 @@ namespace Services
                 return result.Bad(e.Message);
             }
         }
-
-        //public async Task<AppResult> Approve(int id, CancellationToken cancellationToken)
-        //{
-        //    return await ChangeStatus(id, true, cancellationToken);
-        //}
-
-        //public async Task<AppResult> Reject(int id, CancellationToken cancellationToken)
-        //{
-        //    return await ChangeStatus(id, false, cancellationToken);
-        //}
-
-        public async Task<AppResult> GetAll(int page = 1, int take = 30, string filter = null, CancellationToken cancellationToken = default)
+        public async Task<AppResult> GetAllNews(int page = 1, int take = 30, string filter = null, CancellationToken cancellationToken = default)
         {
             var result = new AppResult();
             try
@@ -340,7 +338,8 @@ namespace Services
             {
                 var newsList = await _db.News
                     .Include(n => n.Category)
-                    .Where(n => n.Category.Name.Equals(tag, StringComparison.OrdinalIgnoreCase) && !n.IsDeleted)
+                    .Where(n => n.Category.Name
+                     .Equals(tag, StringComparison.OrdinalIgnoreCase) && !n.IsDeleted)
                     .OrderByDescending(n => n.PublicationDate)
                     .Skip((page - 1) * take)
                     .Take(take)
@@ -382,8 +381,8 @@ namespace Services
                 var newsList = await _db.News
                     .Include(n => n.Verification)
                     .Where(n => n.IsPublished &&
-                                n.Verification.VerificationStatusId != (int)VerificationStatusEnum.InReview &&
-                                !n.IsDeleted) // Assuming 1 is "Verified"
+                                n.Verification.VerificationStatusId != (int)VerificationStatusEnum.Pending &&
+                                !n.IsDeleted)
                     .OrderByDescending(n => n.Verification.VerificationDate)
                     .Skip((page - 1) * take)
                     .Take(take)
@@ -433,7 +432,7 @@ namespace Services
                 _db.News.Update(news);
                 await _db.SaveChangesAsync(cancellationToken);
 
-                return result.Good(news.Id);
+                return result.Good();
             }
             catch (Exception e)
             {

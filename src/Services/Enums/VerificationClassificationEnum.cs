@@ -4,10 +4,10 @@ using System.Text;
 
 namespace Services.Enums
 {
-    public enum VerificationStatusEnum
+    public enum VerificationClassificationEnum
     {
-        Publish = 1,
-        Verified = 2,
+        FakeNews = 1,
+        TrueNews = 2,
         Pending = 4
     }
 

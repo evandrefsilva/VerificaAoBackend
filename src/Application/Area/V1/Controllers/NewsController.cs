@@ -29,7 +29,7 @@ namespace Application.Areas.V1.Controllers
             if (newsDTO.CoverFile != null)
                 newsDTO.CoverUrl = UploadFile(newsDTO.CoverFile, "news", Guid.NewGuid());
 
-            var result = await _newsService.Create(newsDTO, Guid.Parse(Guid.Empty.ToString().Replace("0", "1")), cancellationToken);
+            var result = await _newsService.CreateNews(newsDTO, Guid.Parse(Guid.Empty.ToString().Replace("0", "1")), cancellationToken);
             if (result.Success)
                 return Ok(result);
             return BadRequest(result);
@@ -68,7 +68,7 @@ namespace Application.Areas.V1.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetAllNews(int page = 1, int take = 30, string filter = null)
         {
-            var result = await _newsService.GetAll(page, take, filter);
+            var result = await _newsService.GetAllNews(page, take, filter);
             if (result.Success)
                 return Ok(result);
             return BadRequest(result);

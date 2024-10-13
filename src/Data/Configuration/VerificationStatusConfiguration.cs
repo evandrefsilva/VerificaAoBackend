@@ -11,10 +11,9 @@ namespace Data.Configuration
         public VerificationStatusConfiguration(EntityTypeBuilder<VerificationStatus> builder)
         {
             builder.HasData(
-                new VerificationStatus { Id = 1, Name = "Verdadeira"},
-                new VerificationStatus { Id = 2, Name = "Falsa" },
-                new VerificationStatus { Id = 3, Name = "Em Revisao" },
-                new VerificationStatus { Id = 4, Name = "Pendente Revisão" }
+                new VerificationStatus { Id = 1, Name = "Activo no Portal" },
+                new VerificationStatus { Id = 2, Name = "Verificado" },
+                new VerificationStatus { Id = 3, Name = "Aguardando Verificação" }
             );
         }
     }

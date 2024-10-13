@@ -27,6 +27,9 @@ namespace Services.Models.DTO
 
         public int ReadTime { get; set; }
         public int VerficationId { get; set; }
+        public int? VerificationClassificationId { get; internal set; }
+        public int VerificationStatusId { get; internal set; }
+        public string Obs {  get; set; }
     }
 
     public class VerificationDTOInput
