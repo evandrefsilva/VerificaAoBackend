@@ -32,7 +32,7 @@ namespace Application.Areas.V1.Controllers
             {
                 file.CopyTo(stream);
             }
-            return filePathVirtual + Path.GetExtension(file.FileName);
+            return filePathVirtual;
         }
         [NonAction]
         public string UploadDocument(IFormFile file, string folder, string id)

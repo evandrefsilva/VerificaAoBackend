@@ -24,6 +24,7 @@ using Hangfire.Dashboard;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Services.Helpers;
+using Services.Models.DTO;
 
 namespace Application
 {
@@ -41,7 +42,7 @@ namespace Application
             services.AddDbContext<DataContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("Conn"))
             );
-           
+
             services.AddControllersWithViews();
             services.AddSwaggerGen(c =>
             {
@@ -94,8 +95,14 @@ namespace Application
             services.AddTransient<INewsService, NewsService>();
             services.AddScoped<FileUploadService, FileUploadService>();
 
+            var applicationUrl = Configuration.GetValue<string>("applicationUrl");
             var apiKey = Configuration.GetValue<string>("WesenderApiKey");
             var wesenderCliente = new WeSenderApiClient(apiKey);
+            var appSettings = new AppSettings
+            {
+                ApplicationUrl = applicationUrl
+            };
+            services.AddSingleton(appSettings);
             services.AddSingleton(wesenderCliente);
             //services.AddScoped<IVolunteerOpportunityService, VolunteerOpportunityService>();
 
