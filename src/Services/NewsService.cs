@@ -83,8 +83,8 @@ namespace Services
             try
             {
                 var verifications = await _db.Verifications
-                    .Include(v => v.News) // Inclui os dados da notícia relacionada
-                    .Include(v => v.VerificationStatus) // Inclui o status da verificação
+                    .Include(v => v.News)
+                    .Include(v => v.VerificationStatus)
                     .Include(v => v.RequestedBy)
                     .Include(v => v.VerifiedBy)
                     .Skip((page - 1) * take)
@@ -93,9 +93,9 @@ namespace Services
                     {
                         Id = v.Id,
                         VerificationStatusId = v.VerificationStatusId,
-                        VerificationStatus = v.VerificationStatus.Name, // Assumindo que exista uma propriedade `Name`
-                        RequestedBy = v.RequestedBy.Username, // Assumindo que o Requester seja um User
-                        RequestedDate = v.CreatedAt, // Propriedade que armazena a data da solicitação
+                        VerificationStatus = v.VerificationStatus.Name,
+                        RequestedBy = v.RequestedBy.GetFullName(),
+                        RequestedDate = v.CreatedAt,
                         MainLink = v.MainLink,
                         SecundaryLink = v.SecundaryLink,
                         PublishedDate = v.PublishedDate,
@@ -123,13 +123,14 @@ namespace Services
                 var verification = new Verification
                 {
                     PublishedTitle = dto.PublishedTitle,
-                    VerificationStatusId = (int)VerificationStatusEnum.Pending, // "Em Revisão"
+                    VerificationStatusId = (int)VerificationStatusEnum.Pending,
                     RequestedById = requestedById,
                     MainLink = dto.MainLink,
                     SecundaryLink = dto.SecundaryLink,
                     Obs = dto.Obs,
                     PublishedChannel = dto.PublishedChannel,
-                    PublishedDate = dto.PublishedDate
+                    PublishedDate = dto.PublishedDate,
+                    VerifiedById = dto.VerifiedById,
                 };
 
                 // Associa a verificação à notícia e salva no banco
@@ -155,7 +156,6 @@ namespace Services
                 news.Title = dto.Title;
                 news.Resume = dto.Resume;
                 news.Text = dto.Text;
-                // news.PublicationDate = DateTime.UtcNow;
                 news.CoverUrl = dto.CoverUrl;
 
                 _db.News.Update(news);
@@ -379,7 +379,7 @@ namespace Services
             var result = new AppResult();
             try
             {
-                var newsList = _db.News
+                var newsList = await _db.News
                     .Include(n => n.Verification)
                     .Where(n => n.IsPublished &&
                                 n.Verification.VerificationStatusId != (int)VerificationStatusEnum.InReview &&
@@ -429,7 +429,7 @@ namespace Services
 
 
                 news.IsPublished = !news.IsPublished;
-
+                news.PublicationDate = news.IsPublished ? DateTime.UtcNow : news.PublicationDate;
                 _db.News.Update(news);
                 await _db.SaveChangesAsync(cancellationToken);
 
