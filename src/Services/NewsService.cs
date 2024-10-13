@@ -50,7 +50,8 @@ namespace Services
         {
             var result = new AppResult();
 
-            var verification = await _db.Verifications.FindAsync(dto.VerficationId, cancellationToken);
+            var verification = await _db.Verifications
+                        .FirstOrDefaultAsync(x => x.Id == dto.VerficationId, cancellationToken);
             if (verification == null)
                 return result.Bad("Verificacao invalida");
             try
