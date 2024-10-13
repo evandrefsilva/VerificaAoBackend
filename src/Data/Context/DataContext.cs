@@ -31,6 +31,7 @@ namespace Data.Context
             new UserConfiguration(modelBuilder.Entity<User>());
             new VerificationStatusConfiguration(modelBuilder.Entity<VerificationStatus>());
             new RoleConfiguration(modelBuilder.Entity<Role>());
+            new VerificationClassificationConfiguration(modelBuilder.Entity<VerificationClassification>());
             // Configuração da chave primária composta para RolePermission
             modelBuilder.Entity<UserCategory>()
                 .HasKey(uc => new { uc.CategoryId, uc.UserId });

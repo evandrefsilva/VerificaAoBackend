@@ -72,9 +72,11 @@ namespace Services
                     CategoryId = dto.CategoryId,
                     CoverUrl = dto.CoverUrl,
                     PublishedById = publishedId,
-                    VerificationId = dto.VerficationId
+                    VerificationId = dto.VerficationId,
+                    
                 };
                 // Salva a notícia no banco
+                _db.Update(verification);
                 await _db.News.AddAsync(news, cancellationToken);
                 await _db.SaveChangesAsync(cancellationToken);
 
