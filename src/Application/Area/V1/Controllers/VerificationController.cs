@@ -18,9 +18,11 @@ namespace Application.Areas.V1.Controllers
             _newsService = newsService;
         }
         [HttpGet]
-        public async Task<IActionResult> GetAllVerifications(int page = 1, int take = 30, string filter = null)
+        public async Task<IActionResult> GetAllVerifications(
+            Guid? verifiedById = null, int statusId = 0,
+            int page = 1, int take = 30)
         {
-            var result = await _newsService.GetAllVerfications(page, take);
+            var result = await _newsService.GetAllVerfications(page, take, verifiedById, statusId);
             if (result.Success)
                 return Ok(result);
             return BadRequest(result);

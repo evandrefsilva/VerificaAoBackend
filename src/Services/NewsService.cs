@@ -26,7 +26,8 @@ namespace Services
         Task<AppResult> GetAllPublished(int page = 1, int take = 30, string filter = null, CancellationToken cancellationToken = default);
         Task<AppResult> GetPopularNews(int page = 1, int take = 30, CancellationToken cancellationToken = default);
         //Task<AppResult> VerifyNews(int newsId, VerificationDTOInput verificationDTO, CancellationToken cancellationToken = default);
-        Task<AppResult> GetAllVerfications(int page = 1, int take = 30, CancellationToken cancellationToken = default);
+        Task<AppResult> GetAllVerfications(int page = 1, int take = 30, 
+            Guid? verifiedById = null, int statusId = 0, CancellationToken cancellationToken = default);
         Task<AppResult> ChangeVerificationStatus(ChangeVerificationStatusDTO changeStatusDTO, CancellationToken cancellationToken = default);
 
         Task<AppResult> GetNewsByTag(string tag, int page = 1, int take = 30, CancellationToken cancellationToken = default);
@@ -73,7 +74,7 @@ namespace Services
                     CoverUrl = dto.CoverUrl,
                     PublishedById = publishedId,
                     VerificationId = dto.VerficationId
-                    
+
                 };
                 // Salva a notícia no banco
                 _db.Update(verification);
@@ -87,37 +88,48 @@ namespace Services
                 return result.Bad(e.Message);
             }
         }
-        public async Task<AppResult> GetAllVerfications(int page = 1, int take = 30, CancellationToken cancellationToken = default)
+        public async Task<AppResult> GetAllVerfications(int page = 1, int take = 30,
+            Guid? verifiedById = null,
+            int statusId = 0,
+            CancellationToken cancellationToken = default)
         {
             var result = new AppResult();
             try
             {
-                var verifications = await _db.Verifications
+                var query = _db.Verifications
                     .Include(v => v.News)
                     .Include(v => v.VerificationStatus)
                     .Include(v => v.VerificationClassification)
                     .Include(v => v.RequestedBy)
                     .Include(v => v.VerifiedBy)
-                    .Skip((page - 1) * take)
-                    .Take(take)
-                    .Select(v => new VerificationDTOOutput
-                    {
-                        Id = v.Id,
-                        VerificationStatusId = v.VerificationStatusId,
-                        VerificationStatus = v.VerificationStatus.Name,
-                        VerificationClassification = v.VerificationClassification.Name,
-                        RequestedBy = v.RequestedBy.GetFullName(),
-                        RequestedDate = v.CreatedAt,
-                        MainLink = v.MainLink,
-                        SecundaryLink = v.SecundaryLink,
-                        PublishedDate = v.PublishedDate,
-                        PublishedTile = v.PublishedTitle,
-                        PublishedChannel = v.PublishedChannel,
-                        Obs = v.Obs,
-                        VerifiedByName = v.VerifiedBy == null ?
-                                                "" : v.VerifiedBy.GetFullName(),
-                    })
-                    .ToListAsync(cancellationToken);
+                    .AsQueryable();
+                if (verifiedById != null)
+                    query = query.Where(v => v.VerifiedById == verifiedById);
+                if (statusId != 0)
+                    query = query.Where(v => v.VerificationStatusId == statusId);
+
+
+                var verifications = await query
+                   .Skip((page - 1) * take)
+                   .Take(take)
+                   .Select(v => new VerificationDTOOutput
+                   {
+                       Id = v.Id,
+                       VerificationStatusId = v.VerificationStatusId,
+                       VerificationStatus = v.VerificationStatus.Name,
+                       VerificationClassification = v.VerificationClassification.Name,
+                       RequestedBy = v.RequestedBy.GetFullName(),
+                       RequestedDate = v.CreatedAt,
+                       MainLink = v.MainLink,
+                       SecundaryLink = v.SecundaryLink,
+                       PublishedDate = v.PublishedDate,
+                       PublishedTile = v.PublishedTitle,
+                       PublishedChannel = v.PublishedChannel,
+                       Obs = v.Obs,
+                       VerifiedByName = v.VerifiedBy == null ?
+                                             "" : v.VerifiedBy.GetFullName(),
+                   })
+                 .ToListAsync(cancellationToken);
 
                 return result.Good(verifications);
             }
