@@ -72,7 +72,7 @@ namespace Services
                     CategoryId = dto.CategoryId,
                     CoverUrl = dto.CoverUrl,
                     PublishedById = publishedId,
-                    VerificationId = dto.VerficationId,
+                    VerificationId = dto.VerficationId
                     
                 };
                 // Salva a notícia no banco
