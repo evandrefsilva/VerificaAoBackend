@@ -5,6 +5,7 @@ using Data.Context;
 using Data.NewsVerfication;
 using DocumentFormat.OpenXml.InkML;
 using Microsoft.EntityFrameworkCore;
+using Services.Helpers;
 using Services.Models;
 using Services.Models.DTO;
 
@@ -41,6 +42,7 @@ namespace Services
             var tag = new Category
             {
                 Name = dto.Name,
+                Slug = SlugHelper.GenerateSlug(dto.Name),
                 IsActive = true // Ativa por padrão
             };
 
@@ -59,6 +61,7 @@ namespace Services
                 return res.Bad("Category não encontrada.");
 
             tag.Name = dto.Name;
+            tag.Slug = SlugHelper.GenerateSlug(dto.Name);
             tag.IsActive = dto.IsActive;
 
             _db.Categories.Update(tag);

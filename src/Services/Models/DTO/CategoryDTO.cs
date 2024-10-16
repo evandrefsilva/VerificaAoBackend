@@ -11,15 +11,17 @@ namespace Services.Models.DTO
 
     public class CategoryDTO
     {
-        public CategoryDTO(Category tag)
+        public CategoryDTO(Category category)
         {
-            Id = tag.Id;
-            Name = tag.Name;
-            IsActive = tag.IsActive;
+            Id = category.Id;
+            Name = category.Name;
+            Slug = category.Slug;
+            IsActive = category.IsActive;
         }
 
         public int Id { get; set; }
         public string Name { get; set; }
+        public string Slug { get; set; }
         public bool IsActive { get; set; }
     }
 

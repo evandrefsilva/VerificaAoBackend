@@ -105,9 +105,9 @@ namespace Application.Areas.V1.Controllers
             return BadRequest(result);
         }
 
-        [HttpGet("tag/{id}")]
+        [HttpGet("{id}")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetNewsById(int id, int page = 1, int take = 30, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> GetNewsById(int id, CancellationToken cancellationToken = default)
         {
             var result = await _newsService.GetNewsDetails(id, cancellationToken);
             if (result.Success)

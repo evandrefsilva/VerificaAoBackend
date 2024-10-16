@@ -353,7 +353,7 @@ namespace Services
             {
                 var newsList = await _db.News
                     .Include(n => n.Category)
-                    .Where(n => n.Category.Name
+                    .Where(n => n.Category.Slug
                      .Equals(tag, StringComparison.OrdinalIgnoreCase) && !n.IsDeleted)
                     .OrderByDescending(n => n.PublicationDate)
                     .Skip((page - 1) * take)

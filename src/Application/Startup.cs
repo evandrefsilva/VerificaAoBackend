@@ -25,6 +25,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Services.Helpers;
 using Services.Models.DTO;
+using Services.Models.Settings;
 
 namespace Application
 {
@@ -93,15 +94,19 @@ namespace Application
             services.AddTransient<IAppSettingsService, AppSettingsService>();
             services.AddTransient<ICategoryService, CategoryService>();
             services.AddTransient<INewsService, NewsService>();
+            services.AddTransient<IEmailSenderService, EmailSenderService>();
             services.AddScoped<FileUploadService, FileUploadService>();
+            
+            services.Configure<SmtpSettings>(Configuration.GetSection("SmtpSettings"));
 
-            var applicationUrl = Configuration.GetValue<string>("applicationUrl");
+            var applicationUrl = Configuration.GetValue<string>("ApplicationUrl");
             var apiKey = Configuration.GetValue<string>("WesenderApiKey");
             var wesenderCliente = new WeSenderApiClient(apiKey);
             var appSettings = new AppSettings
             {
                 ApplicationUrl = applicationUrl
             };
+            services.AddSingleton<SmtpSettings>();
             services.AddSingleton(appSettings);
             services.AddSingleton(wesenderCliente);
 

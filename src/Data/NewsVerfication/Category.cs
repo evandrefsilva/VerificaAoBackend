@@ -10,7 +10,8 @@ namespace Data.NewsVerfication
     {
         [Required(ErrorMessage = "Category name is required.")]
         public string Name { get; set; }
+        public string Slug { get; set; }
         public virtual ICollection<News> NewsArticles { get; set; }
-        public virtual ICollection <UserCategory> UserCategories { get; set; }
+        public virtual ICollection<UserCategory> UserCategories { get; set; }
     }
 }
