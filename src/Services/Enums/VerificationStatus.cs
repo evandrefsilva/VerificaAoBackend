@@ -8,7 +8,7 @@ namespace Services.Enums
     {
         Publish = 1,
         Verified = 2,
-        Pending = 4
+        Pending = 3
     }
 
 }
