@@ -10,6 +10,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Data.NewsVerfication;
 using DocumentFormat.OpenXml.Office2010.Excel;
+using Microsoft.AspNetCore.Http;
+using Services.Helpers;
 
 namespace Services
 {
@@ -22,8 +24,7 @@ namespace Services
         //Task<AppResult> Approve(int id, CancellationToken cancellationToken = default);
         //Task<AppResult> Reject(int id, CancellationToken cancellationToken = default);
         // Task<AppResult> ForceReview(int id, CancellationToken cancellationToken = default);
-        Task<AppResult> GetAllNews(int page = 1, int take = 30, string filter = null, CancellationToken cancellationToken = default);
-        Task<AppResult> GetAllPublished(int page = 1, int take = 30, string filter = null, CancellationToken cancellationToken = default);
+        Task<AppResult> GetAllNews(int page = 1, int take = 30, bool onlyPublished = false, string filter = null, CancellationToken cancellationToken = default);
         Task<AppResult> GetPopularNews(int page = 1, int take = 30, CancellationToken cancellationToken = default);
         //Task<AppResult> VerifyNews(int newsId, VerificationDTOInput verificationDTO, CancellationToken cancellationToken = default);
         Task<AppResult> GetAllVerfications(int page = 1, int take = 30,
@@ -42,10 +43,14 @@ namespace Services
     public class NewsService : INewsService
     {
         private readonly DataContext _db;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly string _baseUrl;
 
-        public NewsService(DataContext db)
+        public NewsService(DataContext db, IHttpContextAccessor httpContextAccessor)
         {
             _db = db;
+            _httpContextAccessor = httpContextAccessor;
+            _baseUrl = _httpContextAccessor.GetBaseUrl();
         }
         public async Task<AppResult> CreateNews(NewsDTOInput dto, Guid publishedId, CancellationToken cancellationToken)
         {
@@ -215,7 +220,7 @@ namespace Services
                 return result.Bad(e.Message);
             }
         }
-        public async Task<AppResult> GetAllNews(int page = 1, int take = 30, string filter = null, CancellationToken cancellationToken = default)
+        public async Task<AppResult> GetAllNews(int page = 1, int take = 30, bool onlyPublished = false, string filter = null, CancellationToken cancellationToken = default)
         {
             var result = new AppResult();
             try
@@ -230,14 +235,18 @@ namespace Services
 
                 if (!string.IsNullOrWhiteSpace(filter))
                 {
-                    query = query.Where(x => x.Title.Contains(filter) || x.Resume.Contains(filter) || x.Text.Contains(filter));
+                    query = query.Where(x => x.Title.Contains(filter) || x.Resume.Contains(filter));
+                }
+                if (onlyPublished)
+                {
+                    query = query.Where(n => n.IsPublished);
                 }
 
                 var newsList = await query
                     .OrderByDescending(x => x.PublicationDate)
                     .Skip((page - 1) * take)
                     .Take(take)
-                    .Select(x => new NewsDTOOutput(x))
+                    .Select(x => new NewsDTOOutput(x, _baseUrl))
                     .ToListAsync(cancellationToken);
 
                 return result.Good(newsList);
@@ -247,36 +256,6 @@ namespace Services
                 return result.Bad(e.Message);
             }
         }
-        public async Task<AppResult> GetAllPublished(int page = 1, int take = 30, string filter = null, CancellationToken cancellation = default)
-        {
-            var result = new AppResult();
-            try
-            {
-                var query = _db.News
-                    .Include(n => n.Verification)
-                    .Include(n => n.Category)
-                    .Where(x => x.IsPublished && !x.IsDeleted)
-                    .AsQueryable();
-
-                if (!string.IsNullOrWhiteSpace(filter))
-                {
-                    query = query.Where(x => x.Title.Contains(filter) || x.Resume.Contains(filter) || x.Text.Contains(filter));
-                }
-
-                var publishedNews = await query
-                    .OrderByDescending(x => x.PublicationDate)
-                    .Skip((page - 1) * take)
-                    .Take(take)
-                    .ToListAsync(cancellation);
-
-                return result.Good(publishedNews);
-            }
-            catch (Exception e)
-            {
-                return result.Bad(e.Message);
-            }
-        }
-
 
         public async Task<AppResult> Like(LikeDTO dto, CancellationToken cancellationToken = default)
         {
@@ -358,7 +337,7 @@ namespace Services
                     .Include(n => n.Category)
                     .Where(n => n.Category.Slug == tag && !n.IsDeleted)
                     .OrderByDescending(n => n.PublicationDate)
-                    .Select(n => new NewsDTOOutput(n))
+                    .Select(n => new NewsDTOOutput(n, _baseUrl))
                     .Skip((page - 1) * take)
                     .Take(take)
                     .ToListAsync(cancellationToken);

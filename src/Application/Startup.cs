@@ -109,6 +109,7 @@ namespace Application
             services.AddSingleton<SmtpSettings>();
             services.AddSingleton(appSettings);
             services.AddSingleton(wesenderCliente);
+            services.AddHttpContextAccessor();
 
         }
           public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

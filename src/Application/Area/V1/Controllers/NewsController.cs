@@ -68,7 +68,7 @@ namespace Application.Areas.V1.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetAllNews(int page = 1, int take = 30, string filter = null)
         {
-            var result = await _newsService.GetAllNews(page, take, filter);
+            var result = await _newsService.GetAllNews(page, take, false ,filter);
             if (result.Success)
                 return Ok(result);
             return BadRequest(result);
@@ -78,7 +78,7 @@ namespace Application.Areas.V1.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetAllPublished(int page = 1, int take = 30, string filter = null)
         {
-            var result = await _newsService.GetAllPublished(page, take, filter);
+            var result = await _newsService.GetAllNews(page, take, true, filter);
             if (result.Success)
                 return Ok(result);
             return BadRequest(result);
