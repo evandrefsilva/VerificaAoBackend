@@ -18,7 +18,14 @@ namespace Services.Models.DTO
             UnLike = news.UnLike;
             ReadTime = news.ReadTime;
             PublishedBy = $"{news.PublishedBy?.FirstName} {news.PublishedBy?.LastName}";
-            TagName = news.Category?.Name;
+            CategoryName = news.Category?.Name;
+            CategorySlug = news.Category?.Slug;
+            CategoryId = news.CategoryId;
+            VerificationStatus = news.Verification?.VerificationStatus?.Name;
+            VerificationStatusId = news.VerificationId;
+            VerificationClassification = news.Verification?.VerificationClassification?.Name;
+            VerificationClassificationId = news.Verification.VerificationClassificationId;
+
         }
 
         public int Id { get; set; }
@@ -39,7 +46,14 @@ namespace Services.Models.DTO
 
         public string PublishedBy { get; set; }
 
-        public string TagName { get; set; }
+        public int CategoryId { get; set; }
+        public string CategoryName { get; set; }
+        public string CategorySlug { get; set; }
+
+        public string VerificationStatus { get; set; }
+        public int VerificationStatusId { get; set; }
+        public string VerificationClassification { get; set; }
+        public int? VerificationClassificationId { get; set; }
     }
 
     public class NewsDetailsDTOOutput

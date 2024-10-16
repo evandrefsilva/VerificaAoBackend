@@ -221,7 +221,8 @@ namespace Services
             try
             {
                 var query = _db.News
-                    .Include(n => n.Verification)
+                    .Include(n => n.Verification.VerificationStatus)
+                    .Include(n => n.Verification.VerificationClassification)
                     .Include(n => n.Category)
                     .Include(n => n.PublishedBy)
                     .Where(x => !x.IsDeleted)
@@ -352,6 +353,8 @@ namespace Services
             try
             {
                 var newsList = await _db.News
+                     .Include(n => n.Verification.VerificationStatus)
+                    .Include(n => n.Verification.VerificationClassification)
                     .Include(n => n.Category)
                     .Where(n => n.Category.Slug == tag && !n.IsDeleted)
                     .OrderByDescending(n => n.PublicationDate)
