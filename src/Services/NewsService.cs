@@ -26,7 +26,7 @@ namespace Services
         Task<AppResult> GetAllPublished(int page = 1, int take = 30, string filter = null, CancellationToken cancellationToken = default);
         Task<AppResult> GetPopularNews(int page = 1, int take = 30, CancellationToken cancellationToken = default);
         //Task<AppResult> VerifyNews(int newsId, VerificationDTOInput verificationDTO, CancellationToken cancellationToken = default);
-        Task<AppResult> GetAllVerfications(int page = 1, int take = 30, 
+        Task<AppResult> GetAllVerfications(int page = 1, int take = 30,
             Guid? verifiedById = null, int statusId = 0, CancellationToken cancellationToken = default);
         Task<AppResult> ChangeVerificationStatus(ChangeVerificationStatusDTO changeStatusDTO, CancellationToken cancellationToken = default);
 
@@ -353,9 +353,9 @@ namespace Services
             {
                 var newsList = await _db.News
                     .Include(n => n.Category)
-                    .Where(n => n.Category.Slug
-                     .Equals(tag, StringComparison.OrdinalIgnoreCase) && !n.IsDeleted)
+                    .Where(n => n.Category.Slug == tag && !n.IsDeleted)
                     .OrderByDescending(n => n.PublicationDate)
+                    .Select(n => new NewsDTOOutput(n))
                     .Skip((page - 1) * take)
                     .Take(take)
                     .ToListAsync(cancellationToken);
