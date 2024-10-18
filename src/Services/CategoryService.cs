@@ -17,8 +17,8 @@ namespace Services
         Task<AppResult> CreateCategory(CreateCategoryDTO dto);
         Task<AppResult> UpdateCategory(UpdateCategoryDTO dto);
         Task<AppResult> DeleteCategory(int tagId);
-        Task<AppResult> GetAllCategories(int page = 1, int take = 10, string filter = null);
-        Task<AppResult> GetActiveCategories(int page = 1, int take = 10, string filter = null);
+        Task<AppResult> GetAllCategories(int page = 1, int take = 10, string filter = "");
+        Task<AppResult> GetActiveCategories(int page = 1, int take = 10, string filter = "");
         Task<AppResult> GetCategoryById(int Id);
         Task<AppResult> AssociateUserWithCategory(AssociateUserCategoryDTO dto);
         Task<AppResult> DeassociateUserWithCategory(AssociateUserCategoryDTO dto);
@@ -85,37 +85,22 @@ namespace Services
             return res.Good("Category removida com sucesso.");
         }
 
-        //public async Task<AppResult> AddCategoryToItem(AddCategoryToItemDTO dto)
-        //{
-        //    var res = new AppResult();
-
-        //    var tag = await _db.Categorys.FirstOrDefaultAsync(x => x.Id == dto.CategoryId);
-        //    if (tag == null)
-        //        return res.Bad("Category não encontrada.");
-
-        //    var item = await _db.Items.FirstOrDefaultAsync(x => x.Id == dto.ItemId);
-        //    if (item == null)
-        //        return res.Bad("Item não encontrado.");
-
-        //    // Assumindo que existe uma relação entre Categorys e Items
-        //    item.Categorys.Add(tag);
-
-        //    _db.Items.Update(item);
-        //    await _db.SaveChangesAsync();
-
-        //    return res.Good("Category adicionada ao item com sucesso.");
-        //}
-
-        public async Task<AppResult> GetAllCategories(int page = 1, int take = 10, string filter = null)
+        public async Task<AppResult> GetAllCategories(int page = 1, int take = 10, string filter = "")
         {
-            var tags = await _db.Categories
-                .Where(x => !x.IsDeleted && x.Name.ToLower().Contains(filter.ToLower()))
+            var query = _db.Categories
+                .Where(x => !x.IsDeleted)
                 .OrderBy(x => x.Name)
+                .AsQueryable();
+        
+            if (!string.IsNullOrEmpty(filter))
+                query = query.Where(x => x.Name.ToLower().Contains(filter.ToLower()));
+           
+            var catagories = await query
                 .Skip((page - 1) * take)
                 .Take(take)
                 .Select(x => new CategoryDTO(x))
                 .ToListAsync();
-            return new AppResult().Good("Lista de tags", tags);
+            return new AppResult().Good("Lista de tags", catagories);
         }
 
         public async Task<AppResult> GetCategoryById(int id)
@@ -130,17 +115,22 @@ namespace Services
             return res.Good("Category encontrada.", new CategoryDTO(tag));
         }
 
-        public async Task<AppResult> GetActiveCategories(int page = 1, int take = 10, string filter = null)
+        public async Task<AppResult> GetActiveCategories(int page = 1, int take = 10, string filter = "")
         {
-            var tags = await _db.Categories
-                .Where(x => !x.IsDeleted && x.IsActive &&
-                     x.Name.ToLower().Contains(filter.ToLower()))
-            .OrderBy(x => x.Name)
+
+            var query = _db.Categories
+                .Where(x => !x.IsDeleted && x.IsActive)
+                .OrderBy(x => x.Name)
+                .AsQueryable();
+            if (!string.IsNullOrEmpty(filter))
+                query = query.Where(x => x.Name.ToLower().Contains(filter.ToLower()));
+
+            var catagories = await query
                 .Skip((page - 1) * take)
                 .Take(take)
                 .Select(x => new CategoryDTO(x))
                 .ToListAsync();
-            return new AppResult().Good("Lista de tags", tags);
+            return new AppResult().Good("Lista de tags", catagories);
         }
         public async Task<AppResult> DeassociateUserWithCategory(AssociateUserCategoryDTO dto)
         {
