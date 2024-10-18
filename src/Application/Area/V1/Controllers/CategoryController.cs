@@ -83,9 +83,9 @@ namespace Application.Area.V1.Controllers
         }
         // Listar todas as tags
         [HttpGet]
-        public async Task<IActionResult> GetAllCategorys()
+        public async Task<IActionResult> GetAllCategories(int page = 1, int take = 10, string filter = "")
         {
-            var result = await _categoryService.GetAllCategorys();
+            var result = await _categoryService.GetAllCategories(page, take, filter);
             if (!result.Success)
                 return BadRequest(result);
 
@@ -94,9 +94,9 @@ namespace Application.Area.V1.Controllers
 
         // Listar tags ativas
         [HttpGet("active")]
-        public async Task<IActionResult> GetActiveCategorys()
+        public async Task<IActionResult> GetActiveCategories(int page = 1, int take = 10, string filter = "")
         {
-            var result = await _categoryService.GetActiveCategorys();
+            var result = await _categoryService.GetActiveCategories();
             if (!result.Success)
                 return BadRequest(result);
 

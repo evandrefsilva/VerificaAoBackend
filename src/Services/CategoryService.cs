@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Data.Context;
 using Data.NewsVerfication;
 using DocumentFormat.OpenXml.InkML;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.EntityFrameworkCore;
 using Services.Helpers;
 using Services.Models;
@@ -16,8 +17,8 @@ namespace Services
         Task<AppResult> CreateCategory(CreateCategoryDTO dto);
         Task<AppResult> UpdateCategory(UpdateCategoryDTO dto);
         Task<AppResult> DeleteCategory(int tagId);
-        Task<AppResult> GetAllCategorys();
-        Task<AppResult> GetActiveCategorys();
+        Task<AppResult> GetAllCategories(int page = 1, int take = 10, string filter = null);
+        Task<AppResult> GetActiveCategories(int page = 1, int take = 10, string filter = null);
         Task<AppResult> GetCategoryById(int Id);
         Task<AppResult> AssociateUserWithCategory(AssociateUserCategoryDTO dto);
         Task<AppResult> DeassociateUserWithCategory(AssociateUserCategoryDTO dto);
@@ -77,8 +78,8 @@ namespace Services
             var tag = await _db.Categories.FirstOrDefaultAsync(x => x.Id == tagId);
             if (tag == null)
                 return res.Bad("Category não encontrada.");
-
-            _db.Categories.Remove(tag);
+            tag.IsDeleted = true;
+            _db.Categories.Update(tag);
             await _db.SaveChangesAsync();
 
             return res.Good("Category removida com sucesso.");
@@ -105,9 +106,13 @@ namespace Services
         //    return res.Good("Category adicionada ao item com sucesso.");
         //}
 
-        public async Task<AppResult> GetAllCategorys()
+        public async Task<AppResult> GetAllCategories(int page = 1, int take = 10, string filter = null)
         {
             var tags = await _db.Categories
+                .Where(x => !x.IsDeleted && x.Name.ToLower().Contains(filter.ToLower()))
+                .OrderBy(x => x.Name)
+                .Skip((page - 1) * take)
+                .Take(take)
                 .Select(x => new CategoryDTO(x))
                 .ToListAsync();
             return new AppResult().Good("Lista de tags", tags);
@@ -117,25 +122,25 @@ namespace Services
         {
             var res = new AppResult();
 
-            // Busca a tag no banco de dados usando o ID
             var tag = await _db.Categories
                             .FirstOrDefaultAsync(t => t.Id == id);
 
-            // Verifica se a tag existe
             if (tag == null)
                 return res.Bad("Category não encontrada.");
-
-            // Retorna a tag encontrada
             return res.Good("Category encontrada.", new CategoryDTO(tag));
         }
 
-        public async Task<AppResult> GetActiveCategorys()
+        public async Task<AppResult> GetActiveCategories(int page = 1, int take = 10, string filter = null)
         {
-            var activeCategorys = await _db.Categories
-                .Where(x => x.IsActive)
+            var tags = await _db.Categories
+                .Where(x => !x.IsDeleted && x.IsActive &&
+                     x.Name.ToLower().Contains(filter.ToLower()))
+            .OrderBy(x => x.Name)
+                .Skip((page - 1) * take)
+                .Take(take)
                 .Select(x => new CategoryDTO(x))
                 .ToListAsync();
-            return new AppResult().Good("Lista de tags ativas", activeCategorys);
+            return new AppResult().Good("Lista de tags", tags);
         }
         public async Task<AppResult> DeassociateUserWithCategory(AssociateUserCategoryDTO dto)
         {
