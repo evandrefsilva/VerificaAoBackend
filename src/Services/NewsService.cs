@@ -57,9 +57,12 @@ namespace Services
             var result = new AppResult();
 
             var verification = await _db.Verifications
+                        .Include(v => v.News)
                         .FirstOrDefaultAsync(x => x.Id == dto.VerficationId, cancellationToken);
             if (verification == null)
-                return result.Bad("Verificacao invalida");
+                return result.Bad("Verificação inválida");
+            if(verification.News != null)
+                return result.Bad("Já existe uma noticia associada a essa verificação");
             try
             {
                 verification.VerificationClassificationId = dto.VerificationClassificationId;
@@ -162,8 +165,7 @@ namespace Services
                     VerifiedById = dto.VerifiedById,
                 };
 
-                // Associa a verificação à notícia e salva no banco
-                await _db.Verifications.AddAsync(verification, cancellationToken);
+                 await _db.Verifications.AddAsync(verification, cancellationToken);
                 await _db.SaveChangesAsync(cancellationToken);
 
                 return result.Good("Verification created successfully.");

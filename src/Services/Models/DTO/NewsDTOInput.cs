@@ -20,8 +20,6 @@ namespace Services.Models.DTO
         public string CoverUrl { get; set; }
         public IFormFile? CoverFile { get; set; } = null;
 
-        public DateTime PublishedDate { get; set; }
-
         [Required(ErrorMessage = "The tag id is required.")]
         public int CategoryId { get; set; }
 
