@@ -5,24 +5,25 @@ using Services.Models.DTO;
 using System.Threading.Tasks;
 using System.Threading;
 using System;
+using Services.Models;
 
 namespace Application.Areas.V1.Controllers
 {
     [ApiController]
     public class VerificationController : BaseController
     {
-        private readonly INewsService _newsService;
+        private readonly IVerificationService _verificationService;
 
-        public VerificationController(INewsService newsService)
+        public VerificationController(IVerificationService verificationService)
         {
-            _newsService = newsService;
+            _verificationService = verificationService;
         }
         [HttpGet]
         public async Task<IActionResult> GetAllVerifications(
-            Guid? verifiedById = null, int statusId = 0,
-            int page = 1, int take = 30)
+            [FromQuery] PaginationParameters page,
+            Guid? verifiedById = null, int statusId = 0)
         {
-            var result = await _newsService.GetAllVerfications(page, take, verifiedById, statusId);
+            var result = await _verificationService.GetAllVerifications(page, verifiedById, statusId);
             if (result.Success)
                 return Ok(result);
             return BadRequest(result);
@@ -31,12 +32,12 @@ namespace Application.Areas.V1.Controllers
         // 4. Verificar uma notícia
         [HttpPost("request")]
         //[Authorize]
-        public async Task<IActionResult> RequestVerification([FromForm] VerificationDTOInput verificationDTO, CancellationToken cancellationToken)
+        public async Task<IActionResult> RequestVerification([FromForm] CreateOrEditVerificationDTO verificationDTO, CancellationToken cancellationToken)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var result = await _newsService.CreateVerification(verificationDTO, Guid.Parse(Guid.Empty.ToString().Replace("0", "1")), cancellationToken);
+            var result = await _verificationService.CreateVerification(verificationDTO, Guid.Parse(Guid.Empty.ToString().Replace("0", "1")), cancellationToken);
             if (result.Success)
                 return Ok(result);
             return BadRequest(result);
@@ -50,7 +51,7 @@ namespace Application.Areas.V1.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var result = await _newsService.ChangeVerificationStatus(dto, cancellationToken);
+            var result = await _verificationService.ChangeVerificationStatus(dto, cancellationToken);
             if (result.Success)
                 return Ok(result);
             return BadRequest(result);

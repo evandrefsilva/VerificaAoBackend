@@ -94,9 +94,10 @@ namespace Application
             services.AddTransient<IAppSettingsService, AppSettingsService>();
             services.AddTransient<ICategoryService, CategoryService>();
             services.AddTransient<INewsService, NewsService>();
+            services.AddScoped<IVerificationService, VerificationService>();
             services.AddTransient<IEmailSenderService, EmailSenderService>();
             services.AddScoped<FileUploadService, FileUploadService>();
-            
+
             services.Configure<SmtpSettings>(Configuration.GetSection("SmtpSettings"));
 
             var applicationUrl = Configuration.GetValue<string>("ApplicationUrl");
@@ -112,7 +113,7 @@ namespace Application
             services.AddHttpContextAccessor();
 
         }
-          public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
 
             var services = app.ApplicationServices;

@@ -16,6 +16,7 @@ using Data.AuthEntities;
 using DocumentFormat.OpenXml.Spreadsheet;
 using System.Collections.Generic;
 using Services.Enums;
+using System.Threading;
 
 namespace Services
 {
@@ -229,9 +230,9 @@ namespace Services
             var users = await _db.Users
                 .Include(u => u.Role)
                 .Select(u => new ListUserDTO(u))
-                .Skip((page - 1) * take)
-                 .Take(take)
-                .ToListAsync();
+                    .ToPagedList(page, take);
+
+
             return new AppResult().Good("Listagem de utilizadores.", users);
         }
 

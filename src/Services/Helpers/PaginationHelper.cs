@@ -1,15 +1,19 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Services.Helpers
 {
     public static class PaginationHelper
     {
-        public static DataCollection<T> ToPaginator<T>(
+        public async static Task<PagedList<T>> ToPagedList<T>(
             this IQueryable<T> query,
             int page,
-            int take)
+            int take,
+            CancellationToken cancellationToken = default)
         {
             var originalPages = page;
 
@@ -18,10 +22,10 @@ namespace Services.Helpers
             if (page > 0)
                 page = page * take;
 
-            var result = new DataCollection<T>
+            var result = new PagedList<T>
             {
-                Items = query.Skip(page).Take(take).ToList(),
-                Total = query.Count(),
+                Items = await query.Skip(page).Take(take).ToListAsync(cancellationToken),
+                Total = await query.CountAsync(cancellationToken),
                 Page = originalPages
             };
 
@@ -35,7 +39,7 @@ namespace Services.Helpers
 
     }
 
-    public class DataCollection<T>
+    public class PagedList<T>
     {
         public bool HasItems => Items != null && Items.Any();
         public IEnumerable<T> Items { get; set; }

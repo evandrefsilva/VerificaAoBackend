@@ -1,12 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 
 namespace Services.Models.DTO
 {
-    public class NewsDTOInput
+    public class CreateOrUpdateNewsDTO
     {
         [Required(ErrorMessage = "The news title is required.")]
         public string Title { get; set; }
@@ -30,15 +27,4 @@ namespace Services.Models.DTO
         public string Obs {  get; set; }
     }
 
-    public class VerificationDTOInput
-    {
-        public string MainLink { get; set; }
-        public string SecundaryLink { get; set; }
-        public string Obs { get; set; }
-        public DateTime PublishedDate { get; set; }
-        public string PublishedTitle { get; set; }
-        public string PublishedChannel { get; set; }
-        public List<IFormFile> Attachment { get; set; }
-        public Guid? VerifiedById { get; set; }
-    }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Data.Context;
 using Data.NewsVerfication;
@@ -91,15 +92,13 @@ namespace Services
                 .Where(x => !x.IsDeleted)
                 .OrderBy(x => x.Name)
                 .AsQueryable();
-        
+
             if (!string.IsNullOrEmpty(filter))
                 query = query.Where(x => x.Name.ToLower().Contains(filter.ToLower()));
-           
+
             var catagories = await query
-                .Skip((page - 1) * take)
-                .Take(take)
                 .Select(x => new CategoryDTO(x))
-                .ToListAsync();
+                    .ToPagedList(page, take);
             return new AppResult().Good("Lista de tags", catagories);
         }
 
@@ -126,10 +125,9 @@ namespace Services
                 query = query.Where(x => x.Name.ToLower().Contains(filter.ToLower()));
 
             var catagories = await query
-                .Skip((page - 1) * take)
-                .Take(take)
                 .Select(x => new CategoryDTO(x))
-                .ToListAsync();
+                    .ToPagedList(page, take);
+
             return new AppResult().Good("Lista de tags", catagories);
         }
         public async Task<AppResult> DeassociateUserWithCategory(AssociateUserCategoryDTO dto)

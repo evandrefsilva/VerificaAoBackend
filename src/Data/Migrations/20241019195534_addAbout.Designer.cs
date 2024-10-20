@@ -4,14 +4,16 @@ using Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20241019195534_addAbout")]
+    partial class addAbout
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -158,7 +160,7 @@ namespace Data.Migrations
                         new
                         {
                             Id = new Guid("11111111-1111-1111-1111-111111111111"),
-                            CreatedAt = new DateTime(2024, 10, 20, 14, 8, 46, 240, DateTimeKind.Utc).AddTicks(9612),
+                            CreatedAt = new DateTime(2024, 10, 19, 19, 55, 34, 408, DateTimeKind.Utc).AddTicks(5321),
                             Email = "admin@admin.com",
                             FirstName = "Administrador de Sistema",
                             IsActive = true,
@@ -269,9 +271,6 @@ namespace Data.Migrations
 
                     b.Property<string>("Resume")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Slug")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Text")

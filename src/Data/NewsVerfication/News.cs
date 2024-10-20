@@ -9,6 +9,7 @@ namespace Data.NewsVerfication
 {
     public class News : BaseEntity
     {
+        public string Slug { get; set; }
         [Required(ErrorMessage = "Title of the news is required.")]
         public string Title { get; set; }
         [Required(ErrorMessage = "Resume of the news is required.")]
