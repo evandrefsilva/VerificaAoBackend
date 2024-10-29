@@ -13,6 +13,7 @@ namespace Services.Models.DTO
         {
             Id = news.Id;
             Title = news.Title;
+            Slug = news.Slug;
             Resume = news.Resume;
             PublicationDate = news.PublicationDate;
             IsPublished = news.IsPublished;
@@ -35,6 +36,7 @@ namespace Services.Models.DTO
         }
         public int Id { get; set; }
         public string Title { get; set; }
+        public string Slug {get;set;}
         public string Resume { get; set; }
         public DateTime PublicationDate { get; set; }
         public bool IsPublished { get; set; }
