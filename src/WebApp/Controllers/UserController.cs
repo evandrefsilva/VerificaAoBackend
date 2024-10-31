@@ -22,7 +22,7 @@ namespace Application.Areas.V1.Controllers
 
         // Listar todos os utilizadores
         [HttpGet]
-        public async Task<IActionResult> ListUsers(PaginationParameters page)
+        public async Task<IActionResult> ListUsers([FromQuery] PaginationParameters page)
         {
             
             var result = await _userService.ListUsers(page.page, page.take);
