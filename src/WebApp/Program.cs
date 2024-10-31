@@ -79,6 +79,30 @@ builder.Services.AddEndpointsApiExplorer();
 // Configuração do Swagger
 builder.Services.AddSwaggerGen(c =>
 {
+       c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Introduce el token JWT con el prefijo 'Bearer ' antes del token"
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
     c.SwaggerDoc("v1", new OpenApiInfo
     {
         Title = "Verifica Ao API v1",
