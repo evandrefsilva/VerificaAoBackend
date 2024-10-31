@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Application.Areas.V1.Controllers
 {
-    [Route("/v1/[controller]")]
+    [Route("/api/v1/[controller]")]
     [ApiController]
     public class BaseController : ControllerBase
     {
