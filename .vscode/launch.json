@@ -1,0 +1,15 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": ".NET Core Docker Launch",
+        "type": "docker",
+        "request": "launch",
+        "preLaunchTask": "docker-run: release",
+        "netCore": {
+          "appProject": "${workspaceFolder}/MeuAppDotNet3_1.csproj"
+        }
+      }
+    ]
+  }
+  

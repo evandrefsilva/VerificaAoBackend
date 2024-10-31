@@ -11,6 +11,6 @@ namespace Services.Models
     }
     public class PaginationFilterParameters : PaginationParameters
     {
-        public string filter { get; set; }
+        public string? filter { get; set; } = "";
     }
 }

@@ -1,0 +1,15 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "docker-run: release",
+        "type": "docker-run",
+        "dockerRun": {
+          "image": "meuappdotnet3_1:latest",
+          "containerName": "meuappdotnet3_1",
+          "ports": ["8080:80"]
+        }
+      }
+    ]
+  }
+  

@@ -1,0 +1,6 @@
+  Setup step is copying system data file 'C:\templatedata\master.mdf' to '/var/opt/mssql/data/master.mdf'.
+
+
+2024-10-30 13:54:23.89 Server      ERROR: Setup FAILED copying system data file 'C:\templatedata\master.mdf' to '/var/opt/mssql/data/master.mdf':  5(Access is denied.)
+
+ERROR: BootstrapSystemDataDirectories() failure (HRESULT 0x80070005)
