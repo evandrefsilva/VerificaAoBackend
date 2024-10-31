@@ -85,7 +85,7 @@ namespace Application.Area.V1.Controllers
         }
         // Listar todas as tags
         [HttpGet]
-        public async Task<IActionResult> GetAllCategories(PaginationFilterParameters page)
+        public async Task<IActionResult> GetAllCategories([FromQeury] PaginationFilterParameters page)
         {
             var result = await _categoryService.GetAllCategories(page.page, page.take, page.filter);
             if (!result.Success)
