@@ -5,9 +5,7 @@ using System.Text;
 namespace Services.Models.DTO
 {
 
-    public class UnlikeDTO
+    public class UnlikeDTO: LikeDTO
     {
-        public int NewsId { get; set; }
-        public Guid UserId { get; set; }
     }
 }
