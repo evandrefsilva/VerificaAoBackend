@@ -25,7 +25,8 @@ namespace Application.Areas.V1.Controllers
         // 1. Criar uma nova notícia
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> CreateNews([FromForm] CreateOrUpdateNewsDTO newsDTO, CancellationToken cancellationToken)
+        public async Task<IActionResult> CreateNews([FromForm] CreateOrUpdateNewsDTO newsDTO, 
+            CancellationToken cancellationToken)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -45,7 +46,8 @@ namespace Application.Areas.V1.Controllers
         // 2. Editar uma notícia existente
         [HttpPut("{id}")]
         [Authorize]
-        public async Task<IActionResult> EditNews(int id, [FromForm] CreateOrUpdateNewsDTO newsDTO, CancellationToken cancellationToken)
+        public async Task<IActionResult> EditNews(int id, [FromForm] CreateOrUpdateNewsDTO newsDTO, 
+            CancellationToken cancellationToken)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -76,7 +78,8 @@ namespace Application.Areas.V1.Controllers
         // 4. Listar todas as notícias (paginadas)
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> GetAllNews([FromQuery] PaginationFilterParameters pagination, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> GetAllNews([FromQuery] PaginationFilterParameters pagination, 
+            CancellationToken cancellationToken = default)
         {
             var result = await _newsService.GetAllNews(pagination, false, cancellationToken);
             if (result.Success)
@@ -87,7 +90,8 @@ namespace Application.Areas.V1.Controllers
         // 5. Listar apenas notícias publicadas (paginadas)
         [HttpGet("published")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetAllPublished([FromQuery] PaginationFilterParameters pagination, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> GetAllPublished([FromQuery] PaginationFilterParameters pagination, 
+            CancellationToken cancellationToken = default)
         {
             var result = await _newsService.GetAllNews(pagination, true, cancellationToken);
             if (result.Success)
@@ -98,7 +102,8 @@ namespace Application.Areas.V1.Controllers
         // 6. Listar notícias populares
         [HttpGet("popular")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetPopularNews([FromQuery] PaginationParameters pagination, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> GetPopularNews([FromQuery] PaginationParameters pagination,
+            CancellationToken cancellationToken = default)
         {
             var result = await _newsService.GetPopularNews(pagination, cancellationToken);
             if (result.Success)
@@ -109,7 +114,8 @@ namespace Application.Areas.V1.Controllers
         // 7. Listar notícias por categoria (paginadas)
         [HttpGet("category/{slug}")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetNewsByCategorySlug(string slug, [FromQuery] PaginationFilterParameters pagination, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> GetNewsByCategorySlug(string slug, 
+            [FromQuery] PaginationFilterParameters pagination, CancellationToken cancellationToken = default)
         {
             var result = await _newsService.GetNewsByCategorySlug(slug, pagination, true, cancellationToken);
             if (result.Success)
@@ -128,20 +134,20 @@ namespace Application.Areas.V1.Controllers
         }
         [HttpGet("slug/{slug}")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetNewsDetailsBySlug(string slug, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> GetNewsDetailsBySlug(string slug, 
+            CancellationToken cancellationToken = default)
         {
             var result = await _newsService.GetNewsDetailsBySlug(slug, cancellationToken);
             if (result.Success)
                 return Ok(result);
             return BadRequest(result);
         }
-
-
         // 9. Gostar de uma notícia
         [HttpPost("like")]
         [Authorize]
         public async Task<IActionResult> Like([FromBody] LikeDTO dto, CancellationToken cancellationToken)
         {
+            dto.SetUserId(GetUserId());
             var result = await _newsService.LikeNews(dto, cancellationToken);
             if (!result.Success)
                 return BadRequest(result);
@@ -154,10 +160,10 @@ namespace Application.Areas.V1.Controllers
         [Authorize]
         public async Task<IActionResult> Unlike([FromBody] UnlikeDTO dto, CancellationToken cancellationToken)
         {
+            dto.SetUserId(GetUserId());
             var result = await _newsService.UnlikeNews(dto, cancellationToken);
             if (!result.Success)
                 return BadRequest(result);
-
             return Ok(result);
         }
 

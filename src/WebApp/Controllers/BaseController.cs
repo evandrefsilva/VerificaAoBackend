@@ -5,8 +5,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Application.Areas.V1.Controllers
@@ -69,6 +71,18 @@ namespace Application.Areas.V1.Controllers
                 System.IO.File.Delete(filePath);
             return filePath;
 
+        }
+       [NonAction]
+       public Guid GetUserId()
+        {
+            // Acessa o userId dos claims do usuário autenticado
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+           
+            if (userId == null)
+            {
+                return Guid.Empty;
+            }
+            return Guid.Parse(userId);
         }
     }
 }

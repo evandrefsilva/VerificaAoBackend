@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
@@ -21,8 +22,10 @@ using Services.Clients;
 using Hangfire.Storage.SQLite;
 using WebApp.Filters;
 using Hangfire.Dashboard;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using Services.Helpers;
 using Services.Models.DTO;
 using Services.Models.Settings;
@@ -52,16 +55,20 @@ builder.Services.AddCors(options =>
 });
 
 // Autenticação
-builder.Services.AddAuthentication(x =>
-{
-    x.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-})
-.AddCookie(config =>
-{
-    config.Cookie.Name = "verifica.Cookie";
-    config.LoginPath = "/account/login";
-    config.AccessDeniedPath = "/_401";
-});
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            //ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = "https://api.verifica.ao",
+            ValidAudience = "https://verifica.ao",
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("testetestetesteteste"))
+        };
+    });
 
 // Configurações de SMTP e serviços adicionais
 builder.Services.Configure<SmtpSettings>(configuration.GetSection("SmtpSettings"));

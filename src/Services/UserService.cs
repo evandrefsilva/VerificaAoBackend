@@ -50,7 +50,7 @@ namespace Services
         public UserService(DataContext db)
         {
             _db = db;
-            _jwtSecret = "mysupersecretdeve";
+            _jwtSecret = "testetestetesteteste";
         }
 
         public AppResult Login(LoginDTO dto)
@@ -202,8 +202,8 @@ namespace Services
 
             var claims = new List<Claim>
             {
-                new Claim(JwtRegisteredClaimNames.Sub, user.Username),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                new Claim(ClaimTypes.Name, user.Username),
+                new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString())
             };
 
             // Adiciona as permissões como claims
@@ -214,10 +214,10 @@ namespace Services
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSecret));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
+            
             var token = new JwtSecurityToken(
-                issuer: "verificapp",
-                audience: "verificapp",
+                issuer: "https://api.verifica.ao",
+                audience: "https://verifica.ao",
                 claims: claims,
                 expires: DateTime.Now.AddMinutes(30),
                 signingCredentials: creds);
