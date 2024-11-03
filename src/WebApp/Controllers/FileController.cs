@@ -23,7 +23,7 @@ namespace Application.Areas.V1.Controllers
                 fileUrl =  UploadFile(file, "uploads", Guid.NewGuid());
 
 
-            return Ok(new AppResult().Good("",$"{settings.ApplicationUrl}{fileUrl}"));
+            return Ok(new AppResult().Good("",$"{settings.StorageUrlBase}{fileUrl}"));
         }
 
     }

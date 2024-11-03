@@ -21,7 +21,8 @@ namespace Services.Models.DTO
             CategorySlug = news.Category.Slug;
             PublishedByName = news.PublishedBy.GetFullName();
             VerifiedByName = news.Verification.VerifiedBy.GetFullName();
-            VerifiedByProfilePicture = !string.IsNullOrEmpty(news.Verification?.VerifiedBy?.ProfilePicture) ? $"{baseUrl}{news.CoverUrl}" : null;
+            VerifiedByProfilePicture = !string.IsNullOrEmpty(news.Verification?.VerifiedBy?.ProfilePicture) 
+                ? $"{baseUrl}{news.Verification?.VerifiedBy?.ProfilePicture}" : null;
             VerifiedByAbout = news.Verification.VerifiedBy.About;
             VerificationClassification = news.Verification.VerificationClassification?.Name;
             VerificationClassificationId = news.Verification.VerificationClassificationId;

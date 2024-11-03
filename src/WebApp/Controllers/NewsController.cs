@@ -36,8 +36,7 @@ namespace Application.Areas.V1.Controllers
             {
                 newsDTO.CoverUrl = UploadFile(newsDTO.CoverFile, "news", Guid.NewGuid());
             }
-
-            var result = await _newsService.CreateNews(newsDTO, Guid.NewGuid(), cancellationToken);
+            var result = await _newsService.CreateNews(newsDTO, GetUserId(), cancellationToken);
             if (result.Success)
                 return Ok(result);
             return BadRequest(result);

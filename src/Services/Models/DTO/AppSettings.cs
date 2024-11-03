@@ -6,6 +6,6 @@ namespace Services.Models.DTO
 {
     public class AppSettings
     {
-        public string ApplicationUrl { get; set; }
+        public string StorageUrlBase { get; set; }
     }
 }

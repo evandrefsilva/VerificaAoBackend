@@ -74,7 +74,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.Configure<SmtpSettings>(configuration.GetSection("SmtpSettings"));
 builder.Services.AddSingleton(new AppSettings
 {
-    ApplicationUrl = configuration.GetValue<string>("ApplicationUrl")
+    StorageUrlBase = configuration.GetValue<string>("storageUrlBase")
 });
 builder.Services.AddSingleton(new WeSenderApiClient(configuration.GetValue<string>("WesenderApiKey")));
 builder.Services.AddHttpContextAccessor();
@@ -166,7 +166,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Estrelas Ao Palco - API v1");
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Verifica - API v1");
     });
 }
 else
